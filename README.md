@@ -2,6 +2,8 @@
 
 Instructions:
 
+- open the html file to run
+- press w to toggle wireframe modes
 - click Cube to create a cube
 - click Sphere to create a Sphere
 - click clear to remove the last object added to the scene
