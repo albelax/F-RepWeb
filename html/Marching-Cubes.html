@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<title>Marching Cubes (Three.js)</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link rel=stylesheet href="../css/base.css"/>
+
+	<script src="../lib/three/build/three.min.js"></script>
+	<script src="../src/Detector.js"></script>
+	<script src="../src/Stats.js"></script>
+	<script src="../src/OrbitControls.js"></script>
+	<script src="../src/THREEx.KeyboardState.js"></script>
+	<script src="../src/THREEx.FullScreen.js"></script>
+	<script src="../src/THREEx.WindowResize.js"></script>
+
+	<!-- Contains Lookup Tables for the Marching Cubes Algorithm -->
+	<script src="../src/MarchingCubesData.js"></script>
+	<!--<script src="../src/mainScene.js"></script>-->
+	<script src="../src/main.js"></script>
+	<!-- jQuery code to display an information button and box when clicked. -->
+	<!--<script src="../src/jquery-1.9.1.js"></script>-->
+	<!--<script src="../src/jquery-ui.js"></script>-->
+	<!--<link rel=stylesheet href="../css/jquery-ui.css"/>-->
+	<!--<link rel=stylesheet href="../css/info.css"/>-->
+	<!--<script src="../src/info.js"></script>-->
+	
+</head>
+<body>
+<!--<div id="infoButton"></div>-->
+<!--<div id="infoBox" title="Demo Information">-->
+<!--This three.js demo is part of a collection at-->
+<!--<a href="http://stemkoski.github.io/Three.js/">http://stemkoski.github.io/Three.js/</a>-->
+<!--</div>-->
+<!-- ------------------------------------------------------------ -->
+<div>
+	<div id="ThreeJS" style="position: absolute; left:0px; top:0px">
+		<script>
+			main();
+		</script>
+	</div>
+	<div style="position: absolute; left:0px; top:0px">
+		<input type="text" id="expression"><br>
+		<input type="button" id="clear" value="clear" /><br>
+		<input type="button" id="cube" value="cube" /><br>
+		<input type="button" id="sphere" value="sphere" /><br>
+		<input type="button" id="evaluate" value="evaluate" /><br>
+	</div>
+</div>
+
+</body>
+</html>
