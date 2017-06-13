@@ -3,28 +3,19 @@
 	Author: Lee Stemkoski
 	Date: July 2013 (three.js v59dev)
 */
-
 // MAIN
 // standard global variables
 var container, scene, camera, renderer, controls, stats;
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
 
-// custom global variables
-var points = [];
-var values = [];
 var size;
 
-// expressions
-var g_cube = "Math.max(x*x,y*y,z*z) - 5"; // global expression for cubes
-var g_sphere = "x*x + y*y + z*z - 5"; // global expression for cubes
-//(x + y + z + x*y*z)
-// Math.max(Math.max(Math.abs(x) - 2.5, Math.max(Math.abs(y) - 2.5, Math.abs(z) - 2.5)), -(Math.sqrt(x*x + y*y + z*z) - 3.0))
-// end expressions
-
+var g_expression;
+var g_wireframe = 0;
+var polygonizer = new Polygonizer();
 
 //----------------------------------------------------------------------------------------------------------------------------------------
-// FUNCTIONS 		
 function init() 
 {
 	// SCENE
@@ -41,7 +32,7 @@ function init()
 		renderer = new THREE.WebGLRenderer( {antialias:true} );
 	else
 		renderer = new THREE.CanvasRenderer(); 
-	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+	renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 	renderer.setClearColor( 0x454C4F, 1 );
 	
 	container = document.getElementById( 'ThreeJS' );
@@ -67,16 +58,9 @@ function init()
 	var light3 = new THREE.PointLight(0xffffff);
 	light3.position.set(0,0,10);
 	scene.add(light3);
-	 
-	////////////
-	// CUSTOM //
-	////////////
-	
-	// scene.add( new THREE.AxisHelper(100) );
-	var size = 20;
-	var divisions = 10;
-	var gridHelper = new THREE.GridHelper( size, divisions );
-	scene.add( gridHelper );
+	createGrid( 20, 10 );
+	camera.layers.enable( 1 );
+	// camera.layers.enable( 2 );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
@@ -87,6 +71,20 @@ function animate()
 	render();
 	update();
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+$(document).ready(function() 
+{
+	$(document).keydown(function(e)
+	{
+		if(e.key === "w")
+		{
+			changeRenderingMode(); // toggle wireframe mode
+		}
+	});
+});
+
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -105,190 +103,21 @@ function render()
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
-function makeGeometry( _expression )
+function makeMesh( _expression )
 {
-    points = [];
-    values = [];
-    // number of cubes along a side
-	size = 30;
+	var geometry = polygonizer.makeGeometry( _expression );
+	var colorMaterial =  new THREE.MeshPhongMaterial( {color: 0x828583, side: THREE.DoubleSide} );
+	colorMaterial.w
 
-	var axisMin = -10;
-	var axisMax =  10;
-	var axisRange = axisMax - axisMin;
-	
-	// Generate a list of 3D points and values at those points
-	for (var k = 0; k < size; k++)
-	for (var j = 0; j < size; j++)
-	for (var i = 0; i < size; i++)
-	{
-		// actual values
-		var x = axisMin + axisRange * i / (size - 1);
-		var y = axisMin + axisRange * j / (size - 1);
-		var z = axisMin + axisRange * k / (size - 1);
-		points.push( new THREE.Vector3(x,y,z) );
-		var value = eval(_expression); // evaluates the input expression
-		
-	    values.push( value );
-	}
-	 
-	// Marching Cubes Algorithm
-	
-	var size2 = size * size;
-
-	// Vertices may occur along edges of cube, when the values at the edge's endpoints
-	//   straddle the isolevel value.
-	// Actual position along edge weighted according to function values.
-	var vlist = new Array(12);
-	
-	var geometry = new THREE.Geometry();
-	var vertexIndex = 0;
-	
-	for (var z = 0; z < size - 1; z++)
-	for (var y = 0; y < size - 1; y++)
-	for (var x = 0; x < size - 1; x++)
-	{
-		// index of base point, and also adjacent points on cube
-		var p    = x + size * y + size2 * z,
-			px   = p   + 1,
-			py   = p   + size,
-			pxy  = py  + 1,
-			pz   = p   + size2,
-			pxz  = px  + size2,
-			pyz  = py  + size2,
-			pxyz = pxy + size2;
-		
-		// store scalar values corresponding to vertices
-		var value0 = values[ p    ],
-			value1 = values[ px   ],
-			value2 = values[ py   ],
-			value3 = values[ pxy  ],
-			value4 = values[ pz   ],
-			value5 = values[ pxz  ],
-			value6 = values[ pyz  ],
-			value7 = values[ pxyz ];
-		
-		// place a "1" in bit positions corresponding to vertices whose
-		//   isovalue is less than given constant.
-		
-		var isolevel = 0;
-		
-		var cubeindex = 0;
-		if ( value0 < isolevel ) cubeindex |= 1;
-		if ( value1 < isolevel ) cubeindex |= 2;
-		if ( value2 < isolevel ) cubeindex |= 8;
-		if ( value3 < isolevel ) cubeindex |= 4;
-		if ( value4 < isolevel ) cubeindex |= 16;
-		if ( value5 < isolevel ) cubeindex |= 32;
-		if ( value6 < isolevel ) cubeindex |= 128;
-		if ( value7 < isolevel ) cubeindex |= 64;
-		
-		// bits = 12 bit number, indicates which edges are crossed by the isosurface
-		var bits = THREE.edgeTable[ cubeindex ];
-		
-		// if none are crossed, proceed to next iteration
-		if ( bits === 0 ) continue;
-		
-		// check which edges are crossed, and estimate the point location
-		//    using a weighted average of scalar values at edge endpoints.
-		// store the vertex in an array for use later.
-		var mu = 0.5; 
-		
-		// bottom of the cube
-		if ( bits & 1 )
-		{		
-			mu = ( isolevel - value0 ) / ( value1 - value0 );
-			vlist[0] = points[p].clone().lerp( points[px], mu );
-		}
-		if ( bits & 2 )
-		{
-			mu = ( isolevel - value1 ) / ( value3 - value1 );
-			vlist[1] = points[px].clone().lerp( points[pxy], mu );
-		}
-		if ( bits & 4 )
-		{
-			mu = ( isolevel - value2 ) / ( value3 - value2 );
-			vlist[2] = points[py].clone().lerp( points[pxy], mu );
-		}
-		if ( bits & 8 )
-		{
-			mu = ( isolevel - value0 ) / ( value2 - value0 );
-			vlist[3] = points[p].clone().lerp( points[py], mu );
-		}
-		// top of the cube
-		if ( bits & 16 )
-		{
-			mu = ( isolevel - value4 ) / ( value5 - value4 );
-			vlist[4] = points[pz].clone().lerp( points[pxz], mu );
-		}
-		if ( bits & 32 )
-		{
-			mu = ( isolevel - value5 ) / ( value7 - value5 );
-			vlist[5] = points[pxz].clone().lerp( points[pxyz], mu );
-		}
-		if ( bits & 64 )
-		{
-			mu = ( isolevel - value6 ) / ( value7 - value6 );
-			vlist[6] = points[pyz].clone().lerp( points[pxyz], mu );
-		}
-		if ( bits & 128 )
-		{
-			mu = ( isolevel - value4 ) / ( value6 - value4 );
-			vlist[7] = points[pz].clone().lerp( points[pyz], mu );
-		}
-		// vertical lines of the cube
-		if ( bits & 256 )
-		{
-			mu = ( isolevel - value0 ) / ( value4 - value0 );
-			vlist[8] = points[p].clone().lerp( points[pz], mu );
-		}
-		if ( bits & 512 )
-		{
-			mu = ( isolevel - value1 ) / ( value5 - value1 );
-			vlist[9] = points[px].clone().lerp( points[pxz], mu );
-		}
-		if ( bits & 1024 )
-		{
-			mu = ( isolevel - value3 ) / ( value7 - value3 );
-			vlist[10] = points[pxy].clone().lerp( points[pxyz], mu );
-		}
-		if ( bits & 2048 )
-		{
-			mu = ( isolevel - value2 ) / ( value6 - value2 );
-			vlist[11] = points[py].clone().lerp( points[pyz], mu );
-		}
-		
-		// construct triangles -- get correct vertices from triTable.
-		var i = 0;
-		cubeindex <<= 4;  // multiply by 16... 
-		// "Re-purpose cubeindex into an offset into triTable." 
-		//  since each row really isn't a row.
-		 
-		// the while loop should run at most 5 times,
-		//   since the 16th entry in each row is a -1.
-		while ( THREE.triTable[ cubeindex + i ] != -1 ) 
-		{
-			var index1 = THREE.triTable[cubeindex + i];
-			var index2 = THREE.triTable[cubeindex + i + 1];
-			var index3 = THREE.triTable[cubeindex + i + 2];
-			
-			geometry.vertices.push( vlist[index1].clone() );
-			geometry.vertices.push( vlist[index2].clone() );
-			geometry.vertices.push( vlist[index3].clone() );
-			var face = new THREE.Face3(vertexIndex, vertexIndex+1, vertexIndex+2);
-			geometry.faces.push( face );
-
-			geometry.faceVertexUvs[ 0 ].push( [ new THREE.Vector2(0,0), new THREE.Vector2(0,1), new THREE.Vector2(1,1) ] );
-
-			vertexIndex += 3;
-			i += 3;
-		}
-	}
-	geometry.computeFaceNormals();
-	geometry.computeVertexNormals();
-	
-	var colorMaterial =  new THREE.MeshLambertMaterial( {color: 0x0000ff, side: THREE.DoubleSide} );
 	var mesh = new THREE.Mesh( geometry, colorMaterial );
+	mesh.layers.set(1);
 	scene.add(mesh);
+
+	var geo = new THREE.EdgesGeometry( geometry ); // or WireframeGeometry( geometry )
+	var mat = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 2 } );
+	var wireframe = new THREE.LineSegments( geo, mat );
+	wireframe.layers.set(2);
+	scene.add( wireframe );
 	
 	// console.log( mesh.geometry.vertices );
 }
@@ -296,49 +125,113 @@ function makeGeometry( _expression )
 //----------------------------------------------------------------------------------------------------------------------------------------
 function clear()
 {
+	var deletedLines = false;
+	var deletedMesh = false;
+
     for ( var i = scene.children.length-1; i > 0 ; --i )
-    {
-        // console.log( scene.children[i].type );
-        if( scene.children[i].type == 'Mesh' )
-        {
+    {	
+        // console.log( scene.children[i].id );
+		if ( scene.children[i].name == 'grid' ) // ignore the grid
+			continue;
+
+        else if( scene.children[i].type == 'Mesh' && !deletedMesh ) // deletes mesh
+		{
+			deletedMesh = true;
             scene.remove(scene.children[i]);
-            break;
-        }
-    }
+		}
+
+		else if ( scene.children[i].type == 'LineSegments' && !deletedLines ) // deletes wireframe
+		{
+			deletedLines = true;
+            scene.remove( scene.children[i] );
+		}
+		
+		if ( deletedLines && deletedMesh )
+			break;
+    }	
+	
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------------
 
 function Sphere()
 {
-    makeGeometry(g_sphere);
+    makeMesh("x*x + y*y + z*z - 5");
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------------
 
 function Cube()
 {
-    makeGeometry(g_cube);
+    makeMesh("Math.max(x*x,y*y,z*z) - 5");
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------------
 
 function Evaluate()
 {
-    makeGeometry(document.getElementById("expression").value);
-    // console.log(values);
-    // console.log(points);
+    makeMesh( g_expression );
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------------
 
 window.onload = function()
 { 
-    var clearBtn = document.getElementById('clear');
-    clearBtn.onclick = clear;
-
-    var sphereBtn = document.getElementById('sphere');
-    sphereBtn.onclick = Sphere;
-    
-    var cubeBtn = document.getElementById('cube');
-    cubeBtn.onclick = Cube;
-
-    var evalBtn = document.getElementById('evaluate');
-    evalBtn.onclick = Evaluate;
+	var text = new GUI();
+	var gui = new dat.GUI();
+	gui.add(text, 'Expression').onFinishChange(function()
+	{
+		g_expression = text.Expression;
+	});
+	// gui.add(text, 'speed', -5, 5);
+	// gui.add(text, 'displayOutline');
+	gui.add(text, 'Clear');
+	gui.add(text, 'Sphere');
+	gui.add(text, 'Cube');
+	gui.add(text, 'Evaluate');
+	
 };
 
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+function changeRenderingMode()
+{
+	if ( ++g_wireframe > 2 )
+	{
+		g_wireframe = 0;
+	}
+	switch( g_wireframe )
+	{
+		case( 0 ) : // solid mode
+		{
+			camera.layers.enable( 1 ); 
+			camera.layers.disable( 2 ); break;
+		}
+		case( 1 ) : // wireframe mode
+		{
+			camera.layers.disable( 1 );
+			camera.layers.enable( 2 ); break;
+		}
+		case( 2 ) : // both
+		{
+			camera.layers.enable( 1 ); 
+			camera.layers.enable( 2 );
+			break;
+		}
+		default: break;
+	}
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+function createGrid( _size, _divisions )
+{
+	var gridHelper = new THREE.GridHelper( _size, _divisions );
+	gridHelper.name = 'grid';
+	scene.add( gridHelper );
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------
 
 function main()
 {
@@ -347,3 +240,14 @@ function main()
     
     return 0;
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+var GUI = function() 
+{
+  this.Expression = 'x*x + y*y + z*z - 5';
+  this.Sphere = Sphere;
+  this.Cube = Cube;
+  this.Clear = clear;
+  this.Evaluate = Evaluate;
+};
