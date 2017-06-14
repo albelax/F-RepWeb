@@ -196,7 +196,7 @@ class Polygonizer
 	    }
         geometry.computeFaceNormals();
         geometry.computeVertexNormals();
-
+        
         return geometry;
     }
 
