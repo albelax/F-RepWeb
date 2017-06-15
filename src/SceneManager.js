@@ -100,33 +100,14 @@ class SceneManager
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
-    makeMesh( _expression )
+    makeMesh( _values )
     {
-        var geometry = this.polygonizer.makeGeometry( _expression );
+        var geometry = this.polygonizer.makeGeometry( _values );
         
-        // Per Vertex Color begin //
-        var color, f, p, vertexIndex;
-        var faceIndices = [ 'a', 'b', 'c' ];
-        var radius = 2.5;
-        
-        for ( var i = 0; i < geometry.faces.length; i ++ ) 
-		{
-			f = geometry.faces[ i ];
+        this.addVertexColor( geometry )
 
-			for( var j = 0; j < 3; j++ ) 
-            {
-				vertexIndex = f[ faceIndices[ j ] ];
-				p = geometry.vertices[ vertexIndex ];
-				color = new THREE.Color( 0xffffff );
-				// color.setHSL( ( p.y / radius + 1 ) / 2, 1.0, 0.5 );
-                color.setRGB(p.x/2, p.y/2, p.z/2);
-                // color.setHSL( 0.125 * vertexIndex/geometry.vertices.length, 1.0, 0.5 );
-				f.vertexColors[ j ] = color;
-			}
-		}
-
-        console.log( this.guiText.Color );
-        console.log( this.StringToColor(this.guiText.Color) );
+        // console.log( this.guiText.Color );
+        // console.log( this.StringToColor(this.guiText.Color) );
          if ( this.guiText.Shading == 'Per Vertex' )
             var colorMaterial = new THREE.MeshPhongMaterial( { color: this.StringToColor(this.guiText.Color), side: THREE.DoubleSide, vertexColors: THREE.VertexColors} );
          else 
@@ -137,12 +118,35 @@ class SceneManager
         this.scene.add(mesh);
 
         var geo = new THREE.EdgesGeometry( geometry ); // or WireframeGeometry( geometry )
-        var mat = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 2 } );
+        var mat = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 3 } );
         var wireframe = new THREE.LineSegments( geo, mat );
         wireframe.layers.set(2);
         this.scene.add( wireframe );
         
         // console.log( mesh.geometry.vertices );
+    }
+    //----------------------------------------------------------------------------------------------------------------------------------------
+
+    addVertexColor( _geometry )
+    {
+        var color, f, p, vertexIndex;
+        var faceIndices = [ 'a', 'b', 'c' ];
+        var radius = 2.5;
+        for ( var i = 0; i < _geometry.faces.length; i ++ ) 
+		{
+			f = _geometry.faces[ i ];
+
+			for( var j = 0; j < 3; j++ ) 
+            {
+				vertexIndex = f[ faceIndices[ j ] ];
+				p = _geometry.vertices[ vertexIndex ];
+				color = new THREE.Color( 0xffffff );
+				// color.setHSL( ( p.y / radius + 1 ) / 2, 1.0, 0.5 );
+                color.setRGB(p.x/2, p.y/2, p.z/2);
+                // color.setHSL( 0.125 * vertexIndex/geometry.vertices.length, 1.0, 0.5 );
+				f.vertexColors[ j ] = color;
+			}
+		}
     }
 
     //----------------------------------------------------------------------------------------------------------------------------------------
@@ -184,7 +188,7 @@ class SceneManager
         {	
             if( sceneManager.scene.children[i].type == 'Mesh' ) 
             {
-                var colorMaterial = new THREE.MeshPhongMaterial( { color: 0x828583, side: THREE.DoubleSide, vertexColors: THREE.VertexColors} );
+                var colorMaterial = new THREE.MeshPhongMaterial( { color: this.StringToColor(this.guiText.Color), side: THREE.DoubleSide, vertexColors: THREE.VertexColors} );
                 sceneManager.scene.children[i] = new THREE.Mesh( sceneManager.scene.children[i].geometry, colorMaterial );
             }
         }
@@ -227,5 +231,6 @@ class SceneManager
         }
     }
 
+//----------------------------------------------------------------------------------------------------------------------------------------
 
 }

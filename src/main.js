@@ -3,7 +3,7 @@
 	Author: Lee Stemkoski
 	Date: July 2013 (three.js v59dev)
 */
-
+//(7*x)*(7*x) + (-4*y)*(-4*y) + (-2*z)*(-2*z)  -4
 
 var sceneManager = new SceneManager();
 
@@ -33,14 +33,14 @@ function animate()
 
 var GUI = function() 
 {
-  this.Expression = 'x*x + y*y + z*z - 5';
-  this.Sphere = Sphere;
-  this.Cube = Cube;
-  this.Clear = clear;
-  this.Evaluate = Evaluate;
-  this.Shading = "Uniform";
-  this.Color = "#828583";
-  this.Resolution = 30;
+	this.Expression = 'Subtract(Cube(0,0,0),Sphere(0,0,0))';
+	this.Sphere = makeSphere;
+	this.Cube = makeCube;
+	this.Clear = clear;
+	this.Evaluate = Evaluate;
+	this.Shading = "Uniform";
+	this.Color = "#828583";
+	this.Resolution = 30;
 };
 
 window.onload = function()
@@ -83,17 +83,17 @@ window.onload = function()
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
-function Sphere()
+function makeSphere()
 {
-    sceneManager.makeMesh( "x*x + y*y + z*z - 5" );
+    sceneManager.makeMesh( sceneManager.polygonizer.getValues( "x*x + y*y + z*z - 1" ) );
 	// sceneManager.makeMesh( "(Math.sqrt(x * x + y * y + z*z) - 3.0)" );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
-function Cube()
+function makeCube()
 {
-    sceneManager.makeMesh( "Math.max(x*x,y*y,z*z) - 5" );
+	sceneManager.makeMesh( sceneManager.polygonizer.getValues( "Math.max(x*x,y*y,z*z) - 1" ) );
 	// sceneManager.makeMesh( "Math.max(Math.abs(x) - 2.5, Math.max(Math.abs(y) - 2.5, Math.abs(z) - 2.5))" );
 }
 
@@ -101,7 +101,18 @@ function Cube()
 
 function Evaluate()
 {
-    sceneManager.makeMesh( sceneManager.expression );
+    // sceneManager.makeMesh( sceneManager.expression );
+	var x,y,z,w,h,d = 0;
+	var output = eval( sceneManager.expression );
+	// console.log( output.constructor.name );
+	if ( output.constructor.name == "Number" )
+	{
+		sceneManager.makeMesh( sceneManager.polygonizer.getValues( sceneManager.expression ) );
+	}
+	else if ( output.constructor.name == "GeometryValues" )
+	{
+		sceneManager.makeMesh( output );
+	}
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
@@ -138,6 +149,7 @@ function clear()
 
 function main()
 {
+	// Sphere(_z = 3);
 	sceneManager.init();
 	animate();
     
@@ -145,3 +157,77 @@ function main()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
+
+function Sphere( _x = 0, _y = 0, _z = 0 )
+{
+	console.log("sphere: " +  _x + " - " + _y + " - " + _z );
+	return sceneManager.polygonizer.getValues( "x*x + y*y + z*z - 1", _x, _y, _z );
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+function Cube( _x = 0, _y = 0, _z = 0 )
+{
+	console.log("cube: " +  _x + " - " + _y + " - " + _z );
+	return sceneManager.polygonizer.getValues( "Math.max(x*x,y*y,z*z) - 1", _x, _y, _z );
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+function Subtract( _geoValues1, _geoValues2 )
+{
+	console.log( _geoValues1.points.length + " - "+ _geoValues2.points.length );
+	var outValues = new GeometryValues();
+	outValues.points = _geoValues1.points;
+
+	// console.log( outValues.constructor.name == "GeometryValues" );
+	if ( _geoValues2 == 0 )
+		return _geoValues1;
+	for ( var i = 0; i < _geoValues1.values.length; ++i )
+	{
+		outValues.values[i] = Math.max( _geoValues1.values[i], -_geoValues2.values[i] );
+	}
+
+	outValues.points = _geoValues1.points; // points are always the same, no need to change them
+	return outValues;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+function Union( _geoValues1, _geoValues2 )
+{
+	console.log( _geoValues1.points.length + " - "+ _geoValues2.points.length );
+	var outValues = new GeometryValues();
+	outValues.points = _geoValues1.points;
+
+	// console.log( outValues.constructor.name == "GeometryValues" );
+	if ( _geoValues2 == 0 )
+		return _geoValues1;
+	for ( var i = 0; i < _geoValues1.values.length; ++i )
+	{
+		outValues.values[i] = Math.min( _geoValues1.values[i], _geoValues2.values[i] );
+	}
+
+	outValues.points = _geoValues1.points; // points are always the same, no need to change them
+	return outValues;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+function Intersection( _geoValues1, _geoValues2 )
+{
+	console.log( _geoValues1.points.length + " - "+ _geoValues2.points.length );
+	var outValues = new GeometryValues();
+	outValues.points = _geoValues1.points;
+
+	// console.log( outValues.constructor.name == "GeometryValues" );
+	if ( _geoValues2 == 0 )
+		return _geoValues1;
+	for ( var i = 0; i < _geoValues1.values.length; ++i )
+	{
+		outValues.values[i] = Math.max( _geoValues1.values[i], _geoValues2.values[i] );
+	}
+
+	outValues.points = _geoValues1.points; // points are always the same, no need to change them
+	return outValues;
+}
