@@ -3,9 +3,9 @@ class Polygonizer
     constructor()
     {
         // number of cubes along a side
-	    this.m_size = 30;
-	    this.m_axisMin = -5; // prev 10
-	    this.m_axisMax = 5;
+	    this.m_size = 60;
+	    this.m_axisMin = -10; // prev 10
+	    this.m_axisMax = 10;
         
 	    this.m_axisRange = this.m_axisMax - this.m_axisMin;
         this.type = "MARCHING_CUBES";
@@ -27,12 +27,13 @@ class Polygonizer
             var y = this.m_axisMin + this.m_axisRange * j / (this.m_size - 1);
             var z = this.m_axisMin + this.m_axisRange * k / (this.m_size - 1);
             
-            // console.log(x+ " " + y + " " + z);
+
             x += _offsetX;
             y += _offsetY;
             z += _offsetZ;
-            geoValues.points.push( new THREE.Vector3( x , y, z ) ); // modify here to translate!!!!
             
+            geoValues.points.push( new THREE.Vector3( x +_offsetX , y+ _offsetY, z+_offsetZ ) ); // modify here to translate!!!!
+            // geoValues.points.push( new THREE.Vector3( x  , y, z ) ); // modify here to translate!!!!
             var value = eval( _expression ); // evaluates the input expression
             
             geoValues.values.push( value );

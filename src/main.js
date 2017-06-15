@@ -34,13 +34,13 @@ function animate()
 var GUI = function() 
 {
 	this.Expression = 'Subtract(Cube(0,0,0),Sphere(0,0,0))';
-	this.Sphere = makeSphere;
-	this.Cube = makeCube;
+	// this.Sphere = makeSphere;
+	// this.Cube = makeCube;
 	this.Clear = clear;
 	this.Evaluate = Evaluate;
 	this.Shading = "Uniform";
 	this.Color = "#828583";
-	this.Resolution = 30;
+	this.Resolution = 60;
 };
 
 window.onload = function()
@@ -53,8 +53,8 @@ window.onload = function()
 	// gui.add(text, 'speed', -5, 5);
 	// gui.add(text, 'displayOutline');
 	sceneManager.gui.add( sceneManager.guiText, 'Clear' );
-	sceneManager.gui.add( sceneManager.guiText, 'Sphere' );
-	sceneManager.gui.add( sceneManager.guiText, 'Cube' );
+	// sceneManager.gui.add( sceneManager.guiText, 'Sphere' );
+	// sceneManager.gui.add( sceneManager.guiText, 'Cube' );
 	sceneManager.gui.add( sceneManager.guiText, 'Evaluate' );
 	
 	sceneManager.gui.add( sceneManager.guiText, 'Shading', [ 'Uniform', 'Per Vertex' ] ).onFinishChange(function()
@@ -102,14 +102,14 @@ function makeCube()
 function Evaluate()
 {
     // sceneManager.makeMesh( sceneManager.expression );
-	var x,y,z,w,h,d = 0;
+	var x,y,z,w,h,d;
 	var output = eval( sceneManager.expression );
 	// console.log( output.constructor.name );
 	if ( output.constructor.name == "Number" )
 	{
 		sceneManager.makeMesh( sceneManager.polygonizer.getValues( sceneManager.expression ) );
 	}
-	else if ( output.constructor.name == "GeometryValues" )
+	else //if ( output.constructor.name == "GeometryValues" )
 	{
 		sceneManager.makeMesh( output );
 	}
@@ -160,7 +160,7 @@ function main()
 
 function Sphere( _x = 0, _y = 0, _z = 0 )
 {
-	console.log("sphere: " +  _x + " - " + _y + " - " + _z );
+	// console.log("sphere: " +  _x + " - " + _y + " - " + _z );
 	return sceneManager.polygonizer.getValues( "x*x + y*y + z*z - 1", _x, _y, _z );
 }
 
@@ -168,19 +168,17 @@ function Sphere( _x = 0, _y = 0, _z = 0 )
 
 function Cube( _x = 0, _y = 0, _z = 0 )
 {
-	console.log("cube: " +  _x + " - " + _y + " - " + _z );
+	// console.log("cube: " +  _x + " - " + _y + " - " + _z );
 	return sceneManager.polygonizer.getValues( "Math.max(x*x,y*y,z*z) - 1", _x, _y, _z );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
-function Subtract( _geoValues1, _geoValues2 )
+function Subtract( _geoValues1, _geoValues2 = 0 )
 {
-	console.log( _geoValues1.points.length + " - "+ _geoValues2.points.length );
 	var outValues = new GeometryValues();
 	outValues.points = _geoValues1.points;
 
-	// console.log( outValues.constructor.name == "GeometryValues" );
 	if ( _geoValues2 == 0 )
 		return _geoValues1;
 	for ( var i = 0; i < _geoValues1.values.length; ++i )
@@ -194,13 +192,12 @@ function Subtract( _geoValues1, _geoValues2 )
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
-function Union( _geoValues1, _geoValues2 )
+function Union( _geoValues1, _geoValues2 = 0 )
 {
-	console.log( _geoValues1.points.length + " - "+ _geoValues2.points.length );
+
 	var outValues = new GeometryValues();
 	outValues.points = _geoValues1.points;
 
-	// console.log( outValues.constructor.name == "GeometryValues" );
 	if ( _geoValues2 == 0 )
 		return _geoValues1;
 	for ( var i = 0; i < _geoValues1.values.length; ++i )
@@ -214,13 +211,11 @@ function Union( _geoValues1, _geoValues2 )
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
-function Intersection( _geoValues1, _geoValues2 )
+function Intersection( _geoValues1, _geoValues2 = 0 )
 {
-	console.log( _geoValues1.points.length + " - "+ _geoValues2.points.length );
 	var outValues = new GeometryValues();
 	outValues.points = _geoValues1.points;
 
-	// console.log( outValues.constructor.name == "GeometryValues" );
 	if ( _geoValues2 == 0 )
 		return _geoValues1;
 	for ( var i = 0; i < _geoValues1.values.length; ++i )
