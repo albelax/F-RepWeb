@@ -19,7 +19,6 @@ class SceneManager
         this.m_meshes = [];
         this.m_lights = [];
         this.shading;
-        // this.color;
     }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
@@ -68,10 +67,10 @@ class SceneManager
     	this.scene.add(light3);
     	this.createGrid( 20, 10 );
     	this.camera.layers.enable( 1 );
-    	// camera.layers.enable( 2 );
+
         this.guiText = new GUI();
 	    this.gui = new dat.GUI();
-        // this.polygonizer = new Polygonizer();
+        
     }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
@@ -81,6 +80,10 @@ class SceneManager
         var gridHelper = new THREE.GridHelper( _size, _divisions );
         gridHelper.name = 'grid';
         this.scene.add( gridHelper );
+        
+        var axis = new THREE.AxisHelper( 1 );
+        axis.name = 'grid';
+        this.scene.add( axis );
     }
 
 //----------------------------------------------------------------------------------------------------------------------------------------

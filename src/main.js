@@ -186,7 +186,8 @@ function Subtract( _geoValues1, _geoValues2 = 0 )
 		outValues.values[i] = Math.max( _geoValues1.values[i], -_geoValues2.values[i] );
 	}
 
-	outValues.points = _geoValues1.points; // points are always the same, no need to change them
+	// outValues.points = _geoValues1.points; // points are always the same, no need to change them
+	outValues.points = _geoValues1.originalPoints;	
 	return outValues;
 }
 
@@ -205,7 +206,7 @@ function Union( _geoValues1, _geoValues2 = 0 )
 		outValues.values[i] = Math.min( _geoValues1.values[i], _geoValues2.values[i] );
 	}
 
-	outValues.points = _geoValues1.points; // points are always the same, no need to change them
+	outValues.points = _geoValues1.originalPoints;	
 	return outValues;
 }
 
@@ -223,6 +224,7 @@ function Intersection( _geoValues1, _geoValues2 = 0 )
 		outValues.values[i] = Math.max( _geoValues1.values[i], _geoValues2.values[i] );
 	}
 
-	outValues.points = _geoValues1.points; // points are always the same, no need to change them
+	// outValues.points = _geoValues1.points; // points are always the same, no need to change them
+	outValues.points = _geoValues1.originalPoints;	
 	return outValues;
 }

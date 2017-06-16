@@ -27,7 +27,6 @@ class Polygonizer
             var y = this.m_axisMin + this.m_axisRange * j / (this.m_size - 1);
             var z = this.m_axisMin + this.m_axisRange * k / (this.m_size - 1);
             
-
             x += _offsetX;
             y += _offsetY;
             z += _offsetZ;
@@ -37,6 +36,7 @@ class Polygonizer
             var value = eval( _expression ); // evaluates the input expression
             
             geoValues.values.push( value );
+            geoValues.originalPoints.push(new THREE.Vector3( x -_offsetX , y- _offsetY, z-_offsetZ ) );
         }
 
         return geoValues;
@@ -230,5 +230,6 @@ class GeometryValues
     {
         this.values = [];
         this.points = [];
+        this.originalPoints = [];
     }
 }
