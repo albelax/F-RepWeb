@@ -36,7 +36,7 @@ var GUI = function()
 	this.Expression = 'Subtract(Cube(0,0,0),Sphere(0,0,0))';
 	// this.Sphere = makeSphere;
 	// this.Cube = makeCube;
-	this.Clear = clear;
+	this.Clear = pop;
 	this.Evaluate = Evaluate;
 	this.Shading = "Uniform";
 	this.Color = "#828583";
@@ -101,7 +101,8 @@ function makeCube()
 
 function Evaluate()
 {
-    // sceneManager.makeMesh( sceneManager.expression );
+
+    clear();
 	var x,y,z,w,h,d;
 	var output = eval( sceneManager.expression );
 	// console.log( output.constructor.name );
@@ -117,7 +118,7 @@ function Evaluate()
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
-function clear()
+function pop()
 {
 	var deletedLines = false;
 	var deletedMesh = false;
@@ -142,6 +143,29 @@ function clear()
 		
 		if ( deletedLines && deletedMesh )
 			break;
+    }	
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+function clear()
+{
+    for ( var i = sceneManager.scene.children.length-1; i > 0 ; --i )
+    {	
+        // console.log( scene.children[i].id );
+		if ( sceneManager.scene.children[i].name == 'grid' ) // ignore the grid
+			continue;
+
+        else if( sceneManager.scene.children[i].type == 'Mesh' ) // deletes mesh
+		{
+            sceneManager.scene.remove( sceneManager.scene.children[i] );
+		}
+
+		else if ( sceneManager.scene.children[i].type == 'LineSegments' ) // deletes wireframe
+		{
+            sceneManager.scene.remove( sceneManager.scene.children[i] );
+		}
+
     }	
 }
 
@@ -196,7 +220,6 @@ function Subtract( _geoValues1, _geoValues2 = 0 )
 
 function Union( _geoValues1, _geoValues2 = 0 )
 {
-
 	var outValues = new GeometryValues();
 	outValues.points = _geoValues1.points;
 	outValues.originalPoints = _geoValues1.originalPoints;
