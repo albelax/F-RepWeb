@@ -3,7 +3,7 @@
 	Author: Lee Stemkoski
 	Date: July 2013 (three.js v59dev)
 */
-//(7*x)*(7*x) + (-4*y)*(-4*y) + (-2*z)*(-2*z)  -4
+//(7*x)*(7*x) + (-4*y)*(-4*y) + (-2*z)*(-2*z) - 4
 
 var sceneManager = new SceneManager();
 
@@ -34,14 +34,17 @@ function animate()
 var GUI = function() 
 {
 	this.Expression = 'Subtract(Cube(0,0,0),Sphere(0,0,0))';
-	// this.Sphere = makeSphere;
-	// this.Cube = makeCube;
+
 	this.Clear = pop;
 	this.Evaluate = Evaluate;
 	this.Shading = "Uniform";
 	this.Color = "#828583";
+	this.AxisSize = 10;
 	this.Resolution = 60;
+	this.BoundingBox = 1;
 };
+
+//----------------------------------------------------------------------------------------------------------------------------------------
 
 window.onload = function()
 { 
@@ -74,18 +77,31 @@ window.onload = function()
 		sceneManager.updateColors();
 	});
 
-	sceneManager.gui.add( sceneManager.guiText, 'Resolution').onFinishChange(function()
+	var polys = sceneManager.gui.addFolder('Polygons');
+
+	polys.add( sceneManager.guiText, 'Resolution').onFinishChange(function()
 	{
 		sceneManager.polygonizer.m_size = sceneManager.guiText.Resolution;
 	});
+
+	polys.add( sceneManager.guiText, 'AxisSize', 1, 15).onFinishChange(function()
+	{
+		sceneManager.polygonizer.m_axisMin = -sceneManager.guiText.AxisSize;
+		sceneManager.polygonizer.m_axisMax = sceneManager.guiText.AxisSize;
+		sceneManager.polygonizer.m_axisRange = sceneManager.polygonizer.m_axisMax - sceneManager.polygonizer.m_axisMin;
+	});
 	
+	polys.add( sceneManager.guiText, 'BoundingBox', 1, 15).onFinishChange(function()
+	{
+		sceneManager.boundingBox = sceneManager.guiText.BoundingBox;
+	});
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
 function makeSphere()
 {
-    sceneManager.makeMesh( sceneManager.polygonizer.getValues( "x*x + y*y + z*z - 1" ) );
+    sceneManager.makeMesh( sceneManager.polygonizer.getValues( "x*x + y*y + z*z - " + sceneManager.boundingBox  ) );
 	// sceneManager.makeMesh( "(Math.sqrt(x * x + y * y + z*z) - 3.0)" );
 }
 
@@ -93,7 +109,7 @@ function makeSphere()
 
 function makeCube()
 {
-	sceneManager.makeMesh( sceneManager.polygonizer.getValues( "Math.max(x*x,y*y,z*z) - 1" ) );
+	sceneManager.makeMesh( sceneManager.polygonizer.getValues( "Math.max(x*x,y*y,z*z) - " + sceneManager.boundingBox ) );
 	// sceneManager.makeMesh( "Math.max(Math.abs(x) - 2.5, Math.max(Math.abs(y) - 2.5, Math.abs(z) - 2.5))" );
 }
 
@@ -101,7 +117,6 @@ function makeCube()
 
 function Evaluate()
 {
-
     clear();
 	var x,y,z,w,h,d;
 	var output = eval( sceneManager.expression );
@@ -185,7 +200,7 @@ function main()
 function Sphere( _x = 0, _y = 0, _z = 0 )
 {
 	// console.log("sphere: " +  _x + " - " + _y + " - " + _z );
-	return sceneManager.polygonizer.getValues( "x*x + y*y + z*z - 1", _x, _y, _z );
+	return sceneManager.polygonizer.getValues( "x*x + y*y + z*z -" + sceneManager.boundingBox, _x, _y, _z );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
@@ -193,7 +208,7 @@ function Sphere( _x = 0, _y = 0, _z = 0 )
 function Cube( _x = 0, _y = 0, _z = 0 )
 {
 	// console.log("cube: " +  _x + " - " + _y + " - " + _z );
-	return sceneManager.polygonizer.getValues( "Math.max(x*x,y*y,z*z) - 1", _x, _y, _z );
+	return sceneManager.polygonizer.getValues( "Math.max(x*x,y*y,z*z) - " + sceneManager.boundingBox, _x, _y, _z );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
