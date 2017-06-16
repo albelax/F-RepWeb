@@ -105,8 +105,8 @@ class SceneManager
 
     makeMesh( _values )
     {
+        // console.log( "make mesh:", _values.originalPoints , _values.points);
         var geometry = this.polygonizer.makeGeometry( _values );
-        
         this.addVertexColor( geometry )
 
         // console.log( this.guiText.Color );

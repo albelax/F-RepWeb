@@ -178,12 +178,13 @@ function Subtract( _geoValues1, _geoValues2 = 0 )
 {
 	var outValues = new GeometryValues();
 	outValues.points = _geoValues1.points;
+	outValues.originalPoints = _geoValues1.originalPoints;
 
 	if ( _geoValues2 == 0 )
 		return _geoValues1;
 	for ( var i = 0; i < _geoValues1.values.length; ++i )
 	{
-		outValues.values[i] = Math.max( _geoValues1.values[i], -_geoValues2.values[i] );
+		outValues.values[i] = Math.max( _geoValues1.values[i], - _geoValues2.values[i] );
 	}
 
 	// outValues.points = _geoValues1.points; // points are always the same, no need to change them
@@ -198,6 +199,7 @@ function Union( _geoValues1, _geoValues2 = 0 )
 
 	var outValues = new GeometryValues();
 	outValues.points = _geoValues1.points;
+	outValues.originalPoints = _geoValues1.originalPoints;
 
 	if ( _geoValues2 == 0 )
 		return _geoValues1;
@@ -216,6 +218,7 @@ function Intersection( _geoValues1, _geoValues2 = 0 )
 {
 	var outValues = new GeometryValues();
 	outValues.points = _geoValues1.points;
+	outValues.originalPoints = _geoValues1.originalPoints;
 
 	if ( _geoValues2 == 0 )
 		return _geoValues1;

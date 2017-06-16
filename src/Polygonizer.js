@@ -27,18 +27,20 @@ class Polygonizer
             var y = this.m_axisMin + this.m_axisRange * j / (this.m_size - 1);
             var z = this.m_axisMin + this.m_axisRange * k / (this.m_size - 1);
             
+            geoValues.originalPoints.push(new THREE.Vector3( x , y , z ) );
+
             x += _offsetX;
             y += _offsetY;
             z += _offsetZ;
             
-            geoValues.points.push( new THREE.Vector3( x +_offsetX , y+ _offsetY, z+_offsetZ ) ); // modify here to translate!!!!
-            // geoValues.points.push( new THREE.Vector3( x  , y, z ) ); // modify here to translate!!!!
+            geoValues.points.push( new THREE.Vector3( x +_offsetX , y + _offsetY, z+_offsetZ ) ); // modify here to translate!!!!
+            
             var value = eval( _expression ); // evaluates the input expression
             
             geoValues.values.push( value );
-            geoValues.originalPoints.push(new THREE.Vector3( x -_offsetX , y- _offsetY, z-_offsetZ ) );
-        }
 
+        }
+        // console.log("get Values:", geoValues.originalPoints , geoValues.points);
         return geoValues;
     }
 
@@ -58,6 +60,7 @@ class Polygonizer
         // Vertices may occur along edges of cube, when the values at the edge's endpoints
         // straddle the isolevel value.
         // Actual position along edge weighted according to function values.
+        
         var vlist = new Array(12);
         
         var geometry = new THREE.Geometry();
