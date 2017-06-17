@@ -132,7 +132,7 @@ class SceneManager
     }
     //----------------------------------------------------------------------------------------------------------------------------------------
 
-    addVertexColor( _geometry )
+    addVertexColor( _geometry, _expression = 0 )
     {
         var color, f, p, vertexIndex;
         var faceIndices = [ 'a', 'b', 'c' ];
@@ -146,10 +146,10 @@ class SceneManager
 				vertexIndex = f[ faceIndices[ j ] ];
 				p = _geometry.vertices[ vertexIndex ];
 				color = new THREE.Color( 0xffffff );
-				// color.setHSL( ( p.y / radius + 1 ) / 2, 1.0, 0.5 );
+				// color.setHSL( ( p.y + 1 ) / 2, 1.0, 0.5 );
                 color.setRGB(p.x, p.y, p.z);
                 // color.setHSL( p.y * p.x*2, 1.0, 0.5 );
-                // color.setHSL( 0.125 * vertexIndex/geometry.vertices.length, 1.0, 0.5 );
+                // color.setHSL( 0.125 * vertexIndex/_geometry.vertices.length, 1.0, 0.5 );
 				f.vertexColors[ j ] = color;
 			}
 		}

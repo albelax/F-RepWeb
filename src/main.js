@@ -32,8 +32,6 @@ function animate()
 
 var GUI = function() 
 {
-	// this.Expression = 'Subtract(Cube(0,0,0),Sphere(0,0,0))';
-
 	this.Clear = pop;
 	this.Evaluate = Evaluate;
 	this.Shading = "Uniform";
@@ -46,13 +44,7 @@ var GUI = function()
 //----------------------------------------------------------------------------------------------------------------------------------------
 
 window.onload = function()
-{ 
-
-	// sceneManager.gui.add( sceneManager.guiText, 'Expression' ).onFinishChange(function()
-	// {
-	// 	sceneManager.expression = sceneManager.guiText.Expression;
-	// });
-	
+{ 	
 	sceneManager.gui.add( sceneManager.guiText, 'Clear' );
 	
 	sceneManager.gui.add( sceneManager.guiText, 'Evaluate' );
@@ -121,11 +113,12 @@ function Evaluate()
 {
     clear();
 	var x,y,z,w,h,d;
-	var output = eval( $('textarea#expression').val() );
-	// console.log( output.constructor.name );
+	var text = $('textarea#expression').val();
+	var output = eval( text );
+	 console.log( output.constructor.name );
 	if ( output.constructor.name == "Number" )
 	{
-		sceneManager.makeMesh( sceneManager.polygonizer.getValues( sceneManager.expression ) );
+		sceneManager.makeMesh( sceneManager.polygonizer.getValues( text ) );
 	}
 	else //if ( output.constructor.name == "GeometryValues" )
 	{
@@ -182,7 +175,6 @@ function clear()
 		{
             sceneManager.scene.remove( sceneManager.scene.children[i] );
 		}
-
     }	
 }
 
@@ -202,7 +194,8 @@ function main()
 function Sphere( _x = 0, _y = 0, _z = 0 )
 {
 	// console.log("sphere: " +  _x + " - " + _y + " - " + _z );
-	return sceneManager.polygonizer.getValues( "x*x + y*y + z*z -" + sceneManager.boundingBox, _x, _y, _z );
+	this.size = sceneManager.boundingBox; // temporary
+	return sceneManager.polygonizer.getValues( "x*x + y*y + z*z -" + this.size, _x, _y, _z );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
@@ -210,7 +203,17 @@ function Sphere( _x = 0, _y = 0, _z = 0 )
 function Cube( _x = 0, _y = 0, _z = 0 )
 {
 	// console.log("cube: " +  _x + " - " + _y + " - " + _z );
-	return sceneManager.polygonizer.getValues( "Math.max(x*x,y*y,z*z) - " + sceneManager.boundingBox, _x, _y, _z );
+	this.size = sceneManager.boundingBox; // temporary
+	return sceneManager.polygonizer.getValues( "Math.max(x*x,y*y,z*z) - " + this.size, _x, _y, _z );
+}
+
+function Torus( _x = 0, _y = 0, _z = 0 )
+{
+	this.size = sceneManager.boundingBox; // temporary 
+	return sceneManager.polygonizer.getValues
+	( 
+		"Math.sqrt((Math.sqrt(x*x + z*z)-1.0) * (Math.sqrt(x*x + z*z)-1.0) + y * y) - 0.5", _x, _y, _z 
+	);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------

@@ -6,13 +6,13 @@ body
     font-family:helvetica;
 }  
 
-textarea 
+textarea
 {
     background-color:#1A1A1A;
 	outline: none;
     color:#efefef;
 	font-size: 14px;
-	font-family:monospace;
+	font-family: monospace;
 	resize: vertical;
 	height: 30px;
 	
@@ -20,8 +20,9 @@ textarea
 	border: width 10;
 	border-bottom: thick solid #000000;
 	padding-bottom: 0px;
-	
-	/*overflow-wrap: none;*/
-	/*overflow: hidden;*/
 }
     
+.colorText
+{
+	border-top: thick solid #000000;
+}
