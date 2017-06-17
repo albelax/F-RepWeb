@@ -1,8 +1,27 @@
+
 body 
 {
-	font-family: Monospace;
-	font-weight: bold;
-	background-color: #ccccff;
-	margin: 0px;
 	overflow: hidden;
+    background-color:#454545;
+    font-family:helvetica;
+}  
+
+textarea 
+{
+    background-color:#1A1A1A;
+	outline: none;
+    color:#efefef;
+	font-size: 14px;
+	font-family:monospace;
+	resize: vertical;
+	height: 30px;
+	
+	border: none;
+	border: width 10;
+	border-bottom: thick solid #000000;
+	padding-bottom: 0px;
+	
+	/*overflow-wrap: none;*/
+	/*overflow: hidden;*/
 }
+    

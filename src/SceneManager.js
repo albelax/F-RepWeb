@@ -47,7 +47,7 @@ class SceneManager
     	this.container.appendChild( this.renderer.domElement );
     	// EVENTS
     	THREEx.WindowResize(this.renderer, this.camera);
-    	THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
+    	// THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
     	// CONTROLS
     	this.controls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
     	// STATS
@@ -60,17 +60,18 @@ class SceneManager
     	this.m_lights.push( new THREE.PointLight(0xffffff) );
     	this.m_lights[0].position.set(0,10,0);
     	this.scene.add(this.m_lights[0]);
-    	var light2 = new THREE.PointLight(0xffffff);
-    	light2.position.set(10,0,0);
-    	this.scene.add(light2);
-    	var light3 = new THREE.PointLight(0xffffff);
-    	light3.position.set(0,0,10);
-    	this.scene.add(light3);
+    	this.m_lights[1] = new THREE.PointLight(0xffffff);
+    	this.m_lights[1].position.set(10,0,0);
+    	this.scene.add(this.m_lights[1]);
+    	this.m_lights[2] = new THREE.PointLight(0xffffff);
+    	this.m_lights[2].position.set(0,0,10);
+    	this.scene.add(this.m_lights[2]);
     	this.createGrid( 20, 10 );
     	this.camera.layers.enable( 1 );
 
         this.guiText = new GUI();
-	    this.gui = new dat.GUI();
+	    this.gui = new dat.GUI({ autoPlace: false, width: 390  });
+        
         
     }
 
@@ -146,7 +147,8 @@ class SceneManager
 				p = _geometry.vertices[ vertexIndex ];
 				color = new THREE.Color( 0xffffff );
 				// color.setHSL( ( p.y / radius + 1 ) / 2, 1.0, 0.5 );
-                color.setRGB(p.x/2, p.y/2, p.z/2);
+                color.setRGB(p.x, p.y, p.z);
+                // color.setHSL( p.y * p.x*2, 1.0, 0.5 );
                 // color.setHSL( 0.125 * vertexIndex/geometry.vertices.length, 1.0, 0.5 );
 				f.vertexColors[ j ] = color;
 			}

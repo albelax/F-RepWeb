@@ -1,8 +1,3 @@
-/*
-	Three.js "tutorials by example"
-	Author: Lee Stemkoski
-	Date: July 2013 (three.js v59dev)
-*/
 //(7*x)*(7*x) + (-4*y)*(-4*y) + (-2*z)*(-2*z) - 4
 
 var sceneManager = new SceneManager();
@@ -18,6 +13,10 @@ $(document).ready(function()
 			sceneManager.changeRenderingMode(); // toggle wireframe mode
 		}
 	});
+
+
+	var customContainer = document.getElementById('datGUI');
+    	customContainer.appendChild(sceneManager.gui.domElement);
 });
 
 //----------------------------------------------------------------------------------------------------------------------------------------
@@ -33,7 +32,7 @@ function animate()
 
 var GUI = function() 
 {
-	this.Expression = 'Subtract(Cube(0,0,0),Sphere(0,0,0))';
+	// this.Expression = 'Subtract(Cube(0,0,0),Sphere(0,0,0))';
 
 	this.Clear = pop;
 	this.Evaluate = Evaluate;
@@ -48,16 +47,14 @@ var GUI = function()
 
 window.onload = function()
 { 
-	// sceneManager.guiText = new GUI();
-	sceneManager.gui.add( sceneManager.guiText, 'Expression' ).onFinishChange(function()
-	{
-		sceneManager.expression = sceneManager.guiText.Expression;
-	});
-	// gui.add(text, 'speed', -5, 5);
-	// gui.add(text, 'displayOutline');
+
+	// sceneManager.gui.add( sceneManager.guiText, 'Expression' ).onFinishChange(function()
+	// {
+	// 	sceneManager.expression = sceneManager.guiText.Expression;
+	// });
+	
 	sceneManager.gui.add( sceneManager.guiText, 'Clear' );
-	// sceneManager.gui.add( sceneManager.guiText, 'Sphere' );
-	// sceneManager.gui.add( sceneManager.guiText, 'Cube' );
+	
 	sceneManager.gui.add( sceneManager.guiText, 'Evaluate' );
 	
 	sceneManager.gui.add( sceneManager.guiText, 'Shading', [ 'Uniform', 'Per Vertex' ] ).onFinishChange(function()
@@ -91,10 +88,15 @@ window.onload = function()
 		sceneManager.polygonizer.m_axisRange = sceneManager.polygonizer.m_axisMax - sceneManager.polygonizer.m_axisMin;
 	});
 	
-	polys.add( sceneManager.guiText, 'BoundingBox', 1, 15).onFinishChange(function()
+	polys.add( sceneManager.guiText, 'BoundingBox', 1, 20).onFinishChange(function()
 	{
 		sceneManager.boundingBox = sceneManager.guiText.BoundingBox;
 	});
+	// sceneManager.gui.__controllers[0].domElement.innerHTML = '<input type="textarea">';
+	// sceneManager.gui.__controllers[0].domElement.outerHTML = '<input type="textarea">';
+	// sceneManager.gui.__controllers[0].domElement.style.height = '1300px';
+	// console.log(sceneManager.gui.__controllers[0]);
+	
 };
 
 //----------------------------------------------------------------------------------------------------------------------------------------
@@ -119,7 +121,7 @@ function Evaluate()
 {
     clear();
 	var x,y,z,w,h,d;
-	var output = eval( sceneManager.expression );
+	var output = eval( $('textarea#expression').val() );
 	// console.log( output.constructor.name );
 	if ( output.constructor.name == "Number" )
 	{
