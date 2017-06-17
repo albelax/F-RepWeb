@@ -135,6 +135,8 @@ class SceneManager
     addVertexColor( _geometry, _expression = 0 )
     {
         var color, f, p, vertexIndex;
+        
+
         var faceIndices = [ 'a', 'b', 'c' ];
         var radius = 2.5;
         for ( var i = 0; i < _geometry.faces.length; i ++ ) 
@@ -145,9 +147,15 @@ class SceneManager
             {
 				vertexIndex = f[ faceIndices[ j ] ];
 				p = _geometry.vertices[ vertexIndex ];
-				color = new THREE.Color( 0xffffff );
+                
+                var x = p.x;
+                var y = p.y;
+                var z = p.z;
+				
+                color = new THREE.Color( 0xffffff );
 				// color.setHSL( ( p.y + 1 ) / 2, 1.0, 0.5 );
-                color.setRGB(p.x, p.y, p.z);
+                color.setRGB(x, y, z);
+                // color.setHSL( Math.sin(p.x * p.y + 5), 1.0, 0.5);
                 // color.setHSL( p.y * p.x*2, 1.0, 0.5 );
                 // color.setHSL( 0.125 * vertexIndex/_geometry.vertices.length, 1.0, 0.5 );
 				f.vertexColors[ j ] = color;

@@ -224,6 +224,7 @@ function Subtract( _geoValues1, _geoValues2 = 0 )
 	outValues.points = _geoValues1.points;
 	outValues.originalPoints = _geoValues1.originalPoints;
 
+
 	if ( _geoValues2 == 0 )
 		return _geoValues1;
 	for ( var i = 0; i < _geoValues1.values.length; ++i )
@@ -231,8 +232,14 @@ function Subtract( _geoValues1, _geoValues2 = 0 )
 		outValues.values[i] = Math.max( _geoValues1.values[i], - _geoValues2.values[i] );
 	}
 
-	// outValues.points = _geoValues1.points; // points are always the same, no need to change them
-	outValues.points = _geoValues1.originalPoints;	
+	// for some reason the coordinates of the points need to be flipped
+	for ( var i = 0; i < _geoValues1.originalPoints.length; ++i ) 
+	{
+		outValues.points[i].x = - _geoValues1.originalPoints[i].x;
+		outValues.points[i].y = - _geoValues1.originalPoints[i].y;
+		outValues.points[i].z = - _geoValues1.originalPoints[i].z;
+	}	
+
 	return outValues;
 }
 
@@ -251,7 +258,13 @@ function Union( _geoValues1, _geoValues2 = 0 )
 		outValues.values[i] = Math.min( _geoValues1.values[i], _geoValues2.values[i] );
 	}
 
-	outValues.points = _geoValues1.originalPoints;	
+	// for some reason the coordinates of the points need to be flipped
+	for ( var i = 0; i < _geoValues1.originalPoints.length; ++i ) 
+	{
+		outValues.points[i].x = - _geoValues1.originalPoints[i].x;
+		outValues.points[i].y = - _geoValues1.originalPoints[i].y;
+		outValues.points[i].z = - _geoValues1.originalPoints[i].z;
+	}	
 	return outValues;
 }
 
@@ -270,7 +283,12 @@ function Intersection( _geoValues1, _geoValues2 = 0 )
 		outValues.values[i] = Math.max( _geoValues1.values[i], _geoValues2.values[i] );
 	}
 
-	// outValues.points = _geoValues1.points; // points are always the same, no need to change them
-	outValues.points = _geoValues1.originalPoints;	
+	// for some reason the coordinates of the points need to be flipped
+	for ( var i = 0; i < _geoValues1.originalPoints.length; ++i ) 
+	{
+		outValues.points[i].x = - _geoValues1.originalPoints[i].x;
+		outValues.points[i].y = - _geoValues1.originalPoints[i].y;
+		outValues.points[i].z = - _geoValues1.originalPoints[i].z;
+	}	
 	return outValues;
 }
