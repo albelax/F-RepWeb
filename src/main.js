@@ -133,7 +133,6 @@ function Evaluate()
 	}
 	sceneManager.addVertexColor( geometry, color );
 	sceneManager.makeMesh( geometry );
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
@@ -170,22 +169,10 @@ function pop()
 
 function clear()
 {
-    for ( var i = sceneManager.scene.children.length-1; i > 0 ; --i )
-    {	
-        // console.log( scene.children[i].id );
-		if ( sceneManager.scene.children[i].name == 'grid' ) // ignore the grid
-			continue;
-
-        else if( sceneManager.scene.children[i].type == 'Mesh' ) // deletes mesh
-		{
-            sceneManager.scene.remove( sceneManager.scene.children[i] );
-		}
-
-		else if ( sceneManager.scene.children[i].type == 'LineSegments' ) // deletes wireframe
-		{
-            sceneManager.scene.remove( sceneManager.scene.children[i] );
-		}
-    }	
+	for ( var i = sceneManager.scene.children.length-1; i > 0 ; --i )
+	{
+		pop();
+	}
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
@@ -228,12 +215,11 @@ function Torus( _x = 0, _y = 0, _z = 0 )
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
-function Subtract( _geoValues1, _geoValues2 = 0 )
+function utilSubtract( _geoValues1, _geoValues2 = 0 )
 {
 	var outValues = new GeometryValues();
 	outValues.points = _geoValues1.points;
 	outValues.originalPoints = _geoValues1.originalPoints;
-
 
 	if ( _geoValues2 == 0 )
 		return _geoValues1;
@@ -248,14 +234,30 @@ function Subtract( _geoValues1, _geoValues2 = 0 )
 		outValues.points[i].x = - _geoValues1.originalPoints[i].x;
 		outValues.points[i].y = - _geoValues1.originalPoints[i].y;
 		outValues.points[i].z = - _geoValues1.originalPoints[i].z;
-	}	
+	}
 
 	return outValues;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
-function Union( _geoValues1, _geoValues2 = 0 )
+function Subtract( /**/ )
+{
+	var args = arguments;
+	var outValues = args[0];
+
+	for ( var i = 1; i < args.length; ++i )
+	{
+		console.log( args[i] );
+		outValues = utilSubtract( outValues, args[i] );
+	}
+	
+	return outValues;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+function utilUnion( _geoValues1, _geoValues2 = 0 )
 {
 	var outValues = new GeometryValues();
 	outValues.points = _geoValues1.points;
@@ -280,7 +282,23 @@ function Union( _geoValues1, _geoValues2 = 0 )
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
-function Intersection( _geoValues1, _geoValues2 = 0 )
+function Union( /**/ )
+{
+	var args = arguments;
+	var outValues = 0;
+
+	for ( var i = 0; i < args.length; ++i )
+	{
+		console.log( args[i] );
+		outValues = utilUnion( args[i], outValues );
+	}
+	
+	return outValues;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+function utilIntersection( _geoValues1, _geoValues2 = 0 )
 {
 	var outValues = new GeometryValues();
 	outValues.points = _geoValues1.points;
@@ -300,5 +318,21 @@ function Intersection( _geoValues1, _geoValues2 = 0 )
 		outValues.points[i].y = - _geoValues1.originalPoints[i].y;
 		outValues.points[i].z = - _geoValues1.originalPoints[i].z;
 	}	
+	return outValues;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+function Intersection( /**/ )
+{
+	var args = arguments;
+	var outValues = 0;
+
+	for ( var i = 0; i < args.length; ++i )
+	{
+		console.log( args[i] );
+		outValues = utilIntersection( args[i], outValues );
+	}
+	
 	return outValues;
 }
