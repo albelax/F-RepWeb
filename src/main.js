@@ -84,10 +84,11 @@ window.onload = function()
 	{
 		sceneManager.boundingBox = sceneManager.guiText.BoundingBox;
 	});
-	// sceneManager.gui.__controllers[0].domElement.innerHTML = '<input type="textarea">';
-	// sceneManager.gui.__controllers[0].domElement.outerHTML = '<input type="textarea">';
-	// sceneManager.gui.__controllers[0].domElement.style.height = '1300px';
-	// console.log(sceneManager.gui.__controllers[0]);
+
+	// sceneManager.gui.domElement.style.padding = '0px';
+	// sceneManager.gui.domElement.style.margin = '0em';
+	// console.log(sceneManager.gui.domElement);
+	
 	
 };
 
@@ -113,17 +114,26 @@ function Evaluate()
 {
     clear();
 	var x,y,z,w,h,d;
-	var text = $('textarea#expression').val();
+
+	var text = $('textarea#expression').val(); // get values from the expression text area
+	var color = $('textarea#color').val(); // get values from the color text area
+
+	console.log(color);
 	var output = eval( text );
-	 console.log( output.constructor.name );
+	var geometry;
+
 	if ( output.constructor.name == "Number" )
 	{
-		sceneManager.makeMesh( sceneManager.polygonizer.getValues( text ) );
+		geometry = sceneManager.polygonizer.makeGeometry( sceneManager.polygonizer.getValues( text ) );
+		
 	}
 	else //if ( output.constructor.name == "GeometryValues" )
 	{
-		sceneManager.makeMesh( output );
+		geometry = sceneManager.polygonizer.makeGeometry( output );
 	}
+	sceneManager.addVertexColor( geometry, color );
+	sceneManager.makeMesh( geometry );
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
