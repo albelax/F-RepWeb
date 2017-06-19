@@ -188,49 +188,48 @@ function main()
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
-function Sphere( _x = 0, _y = 0, _z = 0 )
+function Sphere( _x = 0, _y = 0, _z = 0, _diameter = 1 )
 {
 	// console.log("sphere: " +  _x + " - " + _y + " - " + _z );
-	this.size = sceneManager.boundingBox; // temporary
+	this.size = _diameter * sceneManager.boundingBox; // temporary
 	return sceneManager.polygonizer.getValues( "x*x + y*y + z*z -" + this.size, _x, _y, _z );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
-function Cube( _x = 0, _y = 0, _z = 0 )
+function Cube( _x = 0, _y = 0, _z = 0, _size = 1 )
 {
 	// console.log("cube: " +  _x + " - " + _y + " - " + _z );
-	this.size = sceneManager.boundingBox; // temporary
+	this.size = _size * sceneManager.boundingBox; // temporary
 	return sceneManager.polygonizer.getValues( "Math.max(x*x,y*y,z*z) - " + this.size, _x, _y, _z );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
-function Torus( _x = 0, _y = 0, _z = 0 )
+function Torus( _x = 0, _y = 0, _z = 0, _horizontalRadius = 1, _verticalRadius = 0.5 )
 {
-	this.size = sceneManager.boundingBox; // temporary 
+	this.HR = _horizontalRadius * sceneManager.boundingBox;
+	this.VR = _verticalRadius * sceneManager.boundingBox;
 	return sceneManager.polygonizer.getValues
 	( 
-		"Math.sqrt((Math.sqrt(x*x + z*z)-1.0) * (Math.sqrt(x*x + z*z)-1.0) + y * y) - 0.5", _x, _y, _z 
+		"Math.sqrt((Math.sqrt(x*x + z*z)-" + this.HR + ") * (Math.sqrt(x*x + z*z)-" + this.HR + ") + y * y) -" + this.VR, _x, _y, _z 
 	);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
-function InfiniteCylinder( _x = 0, _y = 0, _z = 0 )
+function InfiniteCylinder( _x = 0, _y = 0, _z = 0, _width = 1 )
 {
-	return sceneManager.polygonizer.getValues( "x*x + z*z - 1", _x, _y, _z );
+	return sceneManager.polygonizer.getValues( "x*x + z*z - " + _width, _x, _y, _z );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
-function Cylinder( _x = 0, _y = 0, _z = 0, _height = 1 )
+function Cylinder( _x = 0, _y = 0, _z = 0, _width = 1,_height = 1 )
 {
 	// infinite Cylinder - 2 Planes
-	
-	return utilSubtract( sceneManager.polygonizer.getValues( "x*x + z*z - 1", _x, _y, _z ), 
+	return utilSubtract( sceneManager.polygonizer.getValues( "x*x + z*z - " + _width, _x, _y, _z ),
 		sceneManager.polygonizer.getValues( "-y * y +" + _height, _x, _y, _z ) );
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
