@@ -33,14 +33,13 @@ class Polygonizer
             y += _offsetY;
             z += _offsetZ;
             
-            geoValues.points.push( new THREE.Vector3( x +_offsetX , y + _offsetY, z+_offsetZ ) ); // modify here to translate!!!!
+            geoValues.points.push( new THREE.Vector3( x +_offsetX , y + _offsetY, z + _offsetZ ) ); // modify here to translate!!!!
             
             var value = eval( _expression ); // evaluates the input expression
             
             geoValues.values.push( value );
 
         }
-        // console.log("get Values:", geoValues.originalPoints , geoValues.points);
         return geoValues;
     }
 
