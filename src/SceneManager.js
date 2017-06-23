@@ -108,9 +108,9 @@ class SceneManager
     makeMesh( _geometry )
     {
         if ( this.guiText.Shading == 'Per Vertex' )
-            var colorMaterial = new THREE.MeshPhongMaterial( { color: this.StringToColor(this.guiText.Color), side: THREE.DoubleSide, vertexColors: THREE.VertexColors} );
+            var colorMaterial = new THREE.MeshPhysicalMaterial( { color: this.StringToColor(this.guiText.Color), side: THREE.DoubleSide, vertexColors: THREE.VertexColors} );
         else 
-            var colorMaterial = new THREE.MeshPhongMaterial( { color: this.StringToColor(this.guiText.Color), side: THREE.DoubleSide } );
+            var colorMaterial = new THREE.MeshPhysicalMaterial( { color: this.StringToColor(this.guiText.Color), side: THREE.DoubleSide } );
 
         var mesh = new THREE.Mesh( _geometry, colorMaterial );
         mesh.layers.set(1);

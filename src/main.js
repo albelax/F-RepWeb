@@ -1,5 +1,10 @@
-//(7*x)*(7*x) + (-4*y)*(-4*y) + (-2*z)*(-2*z) - 4
-//(y-z) * 2 + (z-x) *2 + (x-y) *2
+// (7*x)*(7*x) + (-4*y)*(-4*y) + (-2*z)*(-2*z) - 4
+// (y-z) * 2 + (z-x) *2 + (x-y) *2
+// Cool Stuff: // x**4 - 5*x**2 + y**4 - 5*y**2 + z**4 - 5*z**2 + 11.8
+// Torus://Math.sqrt((Math.sqrt(x*x + z*z)- 2) * ( Math.sqrt(x*x + z*z)-2) + y * y ) -1
+
+// SuperEllipsoid: ((x/1)**(2/0.2) + (y/1)**(2/0.2) )**(0.2/0.2) + (z/1)**(2/0.2) -1
+
 var sceneManager = new SceneManager();
 
 //----------------------------------------------------------------------------------------------------------------------------------------
@@ -13,7 +18,6 @@ $(document).ready(function()
 			sceneManager.changeRenderingMode(); // toggle wireframe mode
 		}
 	});
-
 
 	var customContainer = document.getElementById('datGUI');
     	customContainer.appendChild(sceneManager.gui.domElement);
@@ -73,7 +77,7 @@ window.onload = function()
 		sceneManager.polygonizer.m_size = sceneManager.guiText.Resolution;
 	});
 
-	polys.add( sceneManager.guiText, 'AxisSize', 1, 15).onFinishChange(function()
+	polys.add( sceneManager.guiText, 'AxisSize', 1, 150).onFinishChange(function()
 	{
 		sceneManager.polygonizer.m_axisMin = -sceneManager.guiText.AxisSize;
 		sceneManager.polygonizer.m_axisMax = sceneManager.guiText.AxisSize;
@@ -192,7 +196,7 @@ function Sphere( _x = 0, _y = 0, _z = 0, _diameter = 1 )
 {
 	// console.log("sphere: " +  _x + " - " + _y + " - " + _z );
 	this.size = _diameter * sceneManager.boundingBox; // temporary
-	return sceneManager.polygonizer.getValues( "x*x + y*y + z*z -" + this.size, _x, _y, _z );
+	return sceneManager.polygonizer.getValues( "-x*x - y*y - z*z +" + this.size, _x, _y, _z );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
@@ -201,7 +205,7 @@ function Cube( _x = 0, _y = 0, _z = 0, _size = 1 )
 {
 	// console.log("cube: " +  _x + " - " + _y + " - " + _z );
 	this.size = _size * sceneManager.boundingBox; // temporary
-	return sceneManager.polygonizer.getValues( "Math.max(x*x,y*y,z*z) - " + this.size, _x, _y, _z );
+	return sceneManager.polygonizer.getValues( "Math.min(-x*x, -y*y, -z*z) + " + this.size, _x, _y, _z );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
@@ -210,9 +214,10 @@ function Torus( _x = 0, _y = 0, _z = 0, _horizontalRadius = 1, _verticalRadius =
 {
 	this.HR = _horizontalRadius * sceneManager.boundingBox;
 	this.VR = _verticalRadius * sceneManager.boundingBox;
+	
 	return sceneManager.polygonizer.getValues
 	( 
-		"Math.sqrt((Math.sqrt(x*x + z*z)-" + this.HR + ") * (Math.sqrt(x*x + z*z)-" + this.HR + ") + y * y) -" + this.VR, _x, _y, _z 
+		"-(Math.sqrt((Math.sqrt(x*x + z*z)-" + this.HR + ") * ( Math.sqrt(x*x + z*z)-" + this.HR + ") + y * y ) -" + this.VR+")", _x, _y, _z 
 	);
 }
 
@@ -220,44 +225,70 @@ function Torus( _x = 0, _y = 0, _z = 0, _horizontalRadius = 1, _verticalRadius =
 
 function InfiniteCylinder( _x = 0, _y = 0, _z = 0, _width = 1 )
 {
-	return sceneManager.polygonizer.getValues( "x*x + z*z - " + _width, _x, _y, _z );
+	return sceneManager.polygonizer.getValues( "-x*x - z*z + " + _width, _x, _y, _z );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
-function Cylinder( _x = 0, _y = 0, _z = 0, _width = 1,_height = 1 )
+function Cylinder( _x = 0, _y = 0, _z = 0, _width = 1, _height = 1 )
 {
 	// infinite Cylinder - 2 Planes
-	return utilSubtract( sceneManager.polygonizer.getValues( "x*x + z*z - " + _width, _x, _y, _z ),
-		sceneManager.polygonizer.getValues( "-y * y +" + _height, _x, _y, _z ) );
+	var width = _width * sceneManager.boundingBox;
+	var height = _height * sceneManager.boundingBox;
+	return utilSubtract( sceneManager.polygonizer.getValues( "-x*x - z*z + " + width, _x, _y, _z ),
+		sceneManager.polygonizer.getValues( "y * y -" + height, _x, _y, _z ) );
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+function Cone( _x = 0, _y = 0, _z = 0, _width = 1, _height = 1 )
+{
+	// infinite Cylinder - 2 Planes
+	return sceneManager.polygonizer.getValues( "(y*y) - (x*x)/1 - (z*z)/1 " );
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+function TangleCube( _x = 0, _y = 0, _z = 0, _width = 1, _height = 1 )
+{
+	// infinite Cylinder - 2 Planes
+	return sceneManager.polygonizer.getValues( "-(x**4 - 5*x**2 + y**4 - 5*y**2 + z**4 - 5*z**2 + 11.8)" );
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+function SuperEllipsoid(_x = 0, _y = 0, _z = 0, _s1 = 0.2, _s2 = 0.2)
+{
+	var f = "-(( (x/1)**(2/"+_s2+") + (y/1)**(2/"+_s2+") )**("+_s2+"/"+_s1+") + ((z/1)**(2/"+_s1+")) -1)";
+	return sceneManager.polygonizer.getValues( f, _x, _y, _z, _s1, _s2 );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
 function X( _value = 0 )
 {
-	return sceneManager.polygonizer.getValues( "x - 0", _value );
+	return sceneManager.polygonizer.getValues( "-x + 0", _value );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
 function Y2( _value = 0 )
 {
-	return sceneManager.polygonizer.getValues( "-y * y +" + _value );
+	return sceneManager.polygonizer.getValues( "y * y -" + _value );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
 function Y( _value = 0 )
 {
-	return sceneManager.polygonizer.getValues( "y - 0",  0, _value );
+	return sceneManager.polygonizer.getValues( "-y + 0",  0, _value );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
 function Z( _value = 0 )
 {
-	return sceneManager.polygonizer.getValues( "z - 0", 0, 0, _value );
+	return sceneManager.polygonizer.getValues( "-z + 0", 0, 0, _value );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
@@ -272,7 +303,7 @@ function utilSubtract( _geoValues1, _geoValues2 = 0 )
 		return _geoValues1;
 	for ( var i = 0; i < _geoValues1.values.length; ++i )
 	{
-		outValues.values[i] = Math.max( _geoValues1.values[i], - _geoValues2.values[i] );
+		outValues.values[i] = Math.min( _geoValues1.values[i], -_geoValues2.values[i] );
 	}
 
 	// for some reason the coordinates of the points need to be flipped
@@ -314,7 +345,7 @@ function utilUnion( _geoValues1, _geoValues2 = 0 )
 		return _geoValues1;
 	for ( var i = 0; i < _geoValues1.values.length; ++i )
 	{
-		outValues.values[i] = Math.min( _geoValues1.values[i], _geoValues2.values[i] );
+		outValues.values[i] = Math.max( _geoValues1.values[i], _geoValues2.values[i] );
 	}
 
 	// for some reason the coordinates of the points need to be flipped
@@ -355,7 +386,7 @@ function utilIntersection( _geoValues1, _geoValues2 = 0 )
 		return _geoValues1;
 	for ( var i = 0; i < _geoValues1.values.length; ++i )
 	{
-		outValues.values[i] = Math.max( _geoValues1.values[i], _geoValues2.values[i] );
+		outValues.values[i] = Math.min( _geoValues1.values[i], _geoValues2.values[i] );
 	}
 
 	// for some reason the coordinates of the points need to be flipped
@@ -382,6 +413,96 @@ function Intersection( /**/ )
 	}
 	
 	return outValues;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+function Scale( _geoValues, _x = 1, _y = 1, _z = 1 )
+{
+	var outValues = new GeometryValues();
+	outValues.points = _geoValues.points;
+	outValues.values = _geoValues.values;
+	outValues.originalPoints = _geoValues.originalPoints;
+
+	for ( var i = 0; i < _geoValues.points.length; ++i )
+	{
+		outValues.points[i].x = (_geoValues.points[i].x * _x);
+		outValues.points[i].y = (_geoValues.points[i].y * _y);
+		outValues.points[i].z = (_geoValues.points[i].z * _z);
+	}
+	return outValues;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+function Rotate_x( _geoValues, _angle = 0 )
+{
+	var outValues = new GeometryValues();
+	outValues.values = _geoValues.values;
+	outValues.points = _geoValues.points;
+	outValues.originalPoints = _geoValues.originalPoints;
+
+	var axis = new THREE.Vector3( 1, 0, 0 );
+
+	for ( var i = 0; i < _geoValues.points.length; ++i )
+	{
+		outValues.points[i].applyAxisAngle( axis, _angle );
+	}
+
+	return outValues;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+function Rotate_y( _geoValues, _angle = 0 )
+{
+	var outValues = new GeometryValues();
+	outValues.values = _geoValues.values;
+	outValues.points = _geoValues.points;
+	outValues.originalPoints = _geoValues.originalPoints;
+
+	var axis = new THREE.Vector3( 0, 1, 0 );
+
+	for ( var i = 0; i < _geoValues.points.length; ++i )
+	{
+		outValues.points[i].applyAxisAngle( axis, _angle );
+	}
+
+	return outValues;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+function Rotate_z( _geoValues, _angle = 0 )
+{
+	var outValues = new GeometryValues();
+	outValues.values = _geoValues.values;
+	outValues.points = _geoValues.points;
+	outValues.originalPoints = _geoValues.originalPoints;
+
+	var axis = new THREE.Vector3( 0, 0, 1 );
+
+	for ( var i = 0; i < _geoValues.points.length; ++i )
+	{
+		outValues.points[i].applyAxisAngle( axis, _angle );
+	}
+
+	return outValues;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+function Rotate( _geoValues, _axis, _angle = 0 )
+{
+	var angle = Math.PI * _angle / 180;
+	switch( _axis )
+	{
+		case 0: return Rotate_x( _geoValues, angle );
+		case 1: return Rotate_y( _geoValues, angle );
+		case 2: return Rotate_z( _geoValues, angle );
+		default: return;
+	}
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
