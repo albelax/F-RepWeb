@@ -196,7 +196,7 @@ function Sphere( _x = 0, _y = 0, _z = 0, _diameter = 1 )
 {
 	// console.log("sphere: " +  _x + " - " + _y + " - " + _z );
 	this.size = _diameter * sceneManager.boundingBox; // temporary
-	return sceneManager.polygonizer.getValues( "-x*x - y*y - z*z +" + this.size, _x, _y, _z );
+	return sceneManager.polygonizer.getValues( "-x * x - y * y - z * z + " + this.size, _x, _y, _z );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
@@ -205,7 +205,7 @@ function Cube( _x = 0, _y = 0, _z = 0, _size = 1 )
 {
 	// console.log("cube: " +  _x + " - " + _y + " - " + _z );
 	this.size = _size * sceneManager.boundingBox; // temporary
-	return sceneManager.polygonizer.getValues( "Math.min(-x*x, -y*y, -z*z) + " + this.size, _x, _y, _z );
+	return sceneManager.polygonizer.getValues( "Math.min( -x * x, -y * y, -z * z ) + " + this.size, _x, _y, _z );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
@@ -217,7 +217,7 @@ function Torus( _x = 0, _y = 0, _z = 0, _horizontalRadius = 1, _verticalRadius =
 	
 	return sceneManager.polygonizer.getValues
 	( 
-		"-(Math.sqrt((Math.sqrt(x*x + z*z)-" + this.HR + ") * ( Math.sqrt(x*x + z*z)-" + this.HR + ") + y * y ) -" + this.VR+")", _x, _y, _z 
+		"-(Math.sqrt((Math.sqrt(x*x + z*z)-" + this.HR + ") * ( Math.sqrt(x*x + z*z)- " + this.HR + ") + y * y ) -" + this.VR+")", _x, _y, _z 
 	);
 }
 
@@ -235,8 +235,9 @@ function Cylinder( _x = 0, _y = 0, _z = 0, _width = 1, _height = 1 )
 	// infinite Cylinder - 2 Planes
 	var width = _width * sceneManager.boundingBox;
 	var height = _height * sceneManager.boundingBox;
-	return utilSubtract( sceneManager.polygonizer.getValues( "-x*x - z*z + " + width, _x, _y, _z ),
-		sceneManager.polygonizer.getValues( "y * y -" + height, _x, _y, _z ) );
+	var expression = "Math.min( -x*x - z*z + " + _width + ", -( y * y -" + _height + "))";
+	return sceneManager.polygonizer.getValues(expression, _x, _y, _z);
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
@@ -306,7 +307,7 @@ function utilSubtract( _geoValues1, _geoValues2 = 0 )
 		outValues.values[i] = Math.min( _geoValues1.values[i], -_geoValues2.values[i] );
 	}
 
-	// for some reason the coordinates of the points need to be flipped
+	// Inverse transformations
 	for ( var i = 0; i < _geoValues1.originalPoints.length; ++i ) 
 	{
 		outValues.points[i].x = - _geoValues1.originalPoints[i].x;
@@ -348,7 +349,7 @@ function utilUnion( _geoValues1, _geoValues2 = 0 )
 		outValues.values[i] = Math.max( _geoValues1.values[i], _geoValues2.values[i] );
 	}
 
-	// for some reason the coordinates of the points need to be flipped
+	// Inverse transformations
 	for ( var i = 0; i < _geoValues1.originalPoints.length; ++i ) 
 	{
 		outValues.points[i].x = - _geoValues1.originalPoints[i].x;
@@ -364,13 +365,22 @@ function Union( /**/ )
 {
 	var args = arguments;
 	var outValues = 0;
-
+	var expressions = [];
 	for ( var i = 0; i < args.length; ++i )
 	{
-		console.log( args[i] );
+		expressions.push(args[i].expression);
+		// console.log(args[i]);
 		outValues = utilUnion( args[i], outValues );
 	}
-	
+	outValues.expression = "Math.max(";
+	for ( var i = 0; i < expressions.length; ++i)
+	{
+		outValues.expression += expressions[i];
+		if (i+1 < expressions.length)
+			outValues.expression +=  ",";
+	}
+	outValues.expression += ")";
+	console.log(outValues.expression);
 	return outValues;
 }
 
@@ -389,7 +399,7 @@ function utilIntersection( _geoValues1, _geoValues2 = 0 )
 		outValues.values[i] = Math.min( _geoValues1.values[i], _geoValues2.values[i] );
 	}
 
-	// for some reason the coordinates of the points need to be flipped
+	// Inverse transformations
 	for ( var i = 0; i < _geoValues1.originalPoints.length; ++i ) 
 	{
 		outValues.points[i].x = - _geoValues1.originalPoints[i].x;
@@ -490,19 +500,62 @@ function Rotate_z( _geoValues, _angle = 0 )
 	return outValues;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+// function Rotate( _geoValues, _axis, _angle = 0 )
+// {
+// 	var angle = Math.PI * _angle / 180;
+// 	switch( _axis )
+// 	{
+// 		case 0: return Rotate_x( _geoValues, angle );
+// 		case 1: return Rotate_y( _geoValues, angle );
+// 		case 2: return Rotate_z( _geoValues, angle );
+// 		default: return;
+// 	}
+// }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
-function Rotate( _geoValues, _axis, _angle = 0 )
+function Rotate( _geoValues, _axis, _angle = 45 )
 {
 	var angle = Math.PI * _angle / 180;
-	switch( _axis )
+	
+	var outValues = new GeometryValues();
+	outValues.values = _geoValues.values;
+	outValues.points = _geoValues.points;
+	outValues.originalPoints = _geoValues.originalPoints;
+
+	var axis = new THREE.Vector3( 1, 0, 0 );
+
+	for ( var i = 0; i < outValues.points.length; ++i )
 	{
-		case 0: return Rotate_x( _geoValues, angle );
-		case 1: return Rotate_y( _geoValues, angle );
-		case 2: return Rotate_z( _geoValues, angle );
-		default: return;
+		// outValues.points[i].x += _geoValues.offset.x;
+		// outValues.points[i].y += _geoValues.offset.y;
+		// outValues.points[i].z += _geoValues.offset.z;
+
+		// var tmp = outValues.points[i].x * Math.cos( angle ) - outValues.points[i].y * Math.sin( angle );
+		// outValues.points[i].y = outValues.points[i].y * Math.cos( angle ) + outValues.points[i].x * Math.sin( angle );
+		// outValues.points[i].x = tmp;
+		
+		var x = _geoValues.offset.x;
+		var y = _geoValues.offset.y;
+		var z = _geoValues.offset.z;
+
+		x += outValues.points[i].x * Math.cos( angle ) - outValues.points[i].y * Math.sin( angle );
+		y += outValues.points[i].y * Math.cos( angle ) + outValues.points[i].x * Math.sin( angle );
+		z += outValues.points[i].z;
+
+		outValues.values[i] = eval( _geoValues.expression );
 	}
+
+	// for ( var i = 0; i < outValues.originalPoints.length; ++i ) 
+	// {
+	// 	outValues.points[i].x = - outValues.points[i].x;
+	// 	outValues.points[i].y = - outValues.points[i].y;
+	// 	outValues.points[i].z = - outValues.points[i].z;
+	// }	
+	// outValues.originalPoints = outValues.points;
+	return outValues;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------

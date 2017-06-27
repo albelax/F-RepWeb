@@ -17,6 +17,13 @@ class Polygonizer
     {
         // takes an expression and returns a bundle of values and points
         var geoValues = new GeometryValues();
+        
+        geoValues.offset.x = _offsetX;
+        geoValues.offset.y = _offsetY;
+        geoValues.offset.z = _offsetZ;
+
+        geoValues.expression = _expression;
+        // console.log(geoValues.expression);
         // Generate a list of 3D points and values at those points
         for (var k = 0; k < this.m_size; k++)
         for (var j = 0; j < this.m_size; j++)
@@ -26,12 +33,7 @@ class Polygonizer
             var x = this.m_axisMin + this.m_axisRange * i / (this.m_size - 1);
             var y = this.m_axisMin + this.m_axisRange * j / (this.m_size - 1);
             var z = this.m_axisMin + this.m_axisRange * k / (this.m_size - 1);
-            
-            // // test with rotation
-            // var pippo = new THREE.Vector3( x, y, z );
-            // var axis = new THREE.Vector3( 1, 0, 0 );
-            // pippo.applyAxisAngle(axis, Math.PI*45/180);
-            
+                
             geoValues.originalPoints.push( new THREE.Vector3( x , y , z ) );
 
             x += _offsetX;
@@ -39,15 +41,9 @@ class Polygonizer
             z += _offsetZ;
             
             geoValues.points.push( new THREE.Vector3( x + _offsetX , y + _offsetY, z + _offsetZ ) ); // modify here to translate!!!!
-            
-            // x = pippo.x;
-            // y = pippo.y;
-            // z = pippo.z;
-            geoValues.originalValues.push(new THREE.Vector3(x,y,z)); // now I can rotate the values
-            var value = eval( _expression ); // evaluates the input expression
-            
-            geoValues.values.push( value );
-
+        
+            geoValues.originalValues.push( new THREE.Vector3(x, y, z) ); // now I can rotate the values
+            geoValues.values.push( eval( _expression ) );
         }
         return geoValues;
     }
@@ -243,5 +239,7 @@ class GeometryValues
         this.points = [];
         this.originalPoints = [];
         this.originalValues = [];
+        this.expression;
+        this.offset = new THREE.Vector3();
     }
 }
