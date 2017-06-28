@@ -369,7 +369,7 @@ function Union( /**/ )
 	for ( var i = 0; i < args.length; ++i )
 	{
 		expressions.push(args[i].expression);
-		// console.log(args[i]);
+		console.log(args[i]);
 		outValues = utilUnion( args[i], outValues );
 	}
 	outValues.expression = "Math.max(";
@@ -380,7 +380,9 @@ function Union( /**/ )
 			outValues.expression +=  ",";
 	}
 	outValues.expression += ")";
-	console.log(outValues.expression);
+	outValues.originalValues = outValues.values;
+	// outValues.originalValues = args[0].originalValues;
+	// console.log(outValues.expression);
 	return outValues;
 }
 
@@ -447,115 +449,98 @@ function Scale( _geoValues, _x = 1, _y = 1, _z = 1 )
 
 function Rotate_x( _geoValues, _angle = 0 )
 {
-	var outValues = new GeometryValues();
-	outValues.values = _geoValues.values;
-	outValues.points = _geoValues.points;
-	outValues.originalPoints = _geoValues.originalPoints;
+	// var angle = Math.PI * _angle / 180;
+	
+	for ( var i = 0; i < _geoValues.originalPoints.length; ++i )
+	{		
+		var x = _geoValues.offset.x;
+		var y = _geoValues.offset.y;
+		var z = _geoValues.offset.z;
 
-	var axis = new THREE.Vector3( 1, 0, 0 );
+		x += _geoValues.originalPoints[i].x;
+		y += _geoValues.originalPoints[i].y * Math.sin( _angle ) + _geoValues.originalPoints[i].z * Math.cos( _angle );
+		z += _geoValues.originalPoints[i].y * Math.cos( _angle ) - _geoValues.originalPoints[i].z * Math.sin( _angle );
 
-	for ( var i = 0; i < _geoValues.points.length; ++i )
-	{
-		outValues.points[i].applyAxisAngle( axis, _angle );
+		_geoValues.values[i] = eval( _geoValues.expression );
 	}
-
-	return outValues;
+	
+	for ( var i = 0; i < _geoValues.originalPoints.length; ++i ) 
+	{
+		_geoValues.points[i].x = - _geoValues.originalPoints[i].x;
+		_geoValues.points[i].y = - _geoValues.originalPoints[i].y;
+		_geoValues.points[i].z = - _geoValues.originalPoints[i].z;
+	}	
+	return _geoValues;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
 function Rotate_y( _geoValues, _angle = 0 )
 {
-	var outValues = new GeometryValues();
-	outValues.values = _geoValues.values;
-	outValues.points = _geoValues.points;
-	outValues.originalPoints = _geoValues.originalPoints;
+	// var angle = Math.PI * _angle / 180;
+	
+	for ( var i = 0; i < _geoValues.originalPoints.length; ++i )
+	{		
+		var x = _geoValues.offset.x;
+		var y = _geoValues.offset.y;
+		var z = _geoValues.offset.z;
 
-	var axis = new THREE.Vector3( 0, 1, 0 );
+		x += _geoValues.originalPoints[i].z * Math.cos( _angle ) - _geoValues.originalPoints[i].x * Math.sin( _angle );
+		y += _geoValues.originalPoints[i].y;
+		z += _geoValues.originalPoints[i].z * Math.sin( _angle ) + _geoValues.originalPoints[i].x * Math.cos( _angle );
 
-	for ( var i = 0; i < _geoValues.points.length; ++i )
-	{
-		outValues.points[i].applyAxisAngle( axis, _angle );
+		_geoValues.values[i] = eval( _geoValues.expression );
 	}
-
-	return outValues;
+	
+	for ( var i = 0; i < _geoValues.originalPoints.length; ++i ) 
+	{
+		_geoValues.points[i].x = - _geoValues.originalPoints[i].x;
+		_geoValues.points[i].y = - _geoValues.originalPoints[i].y;
+		_geoValues.points[i].z = - _geoValues.originalPoints[i].z;
+	}	
+	return _geoValues;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
 function Rotate_z( _geoValues, _angle = 0 )
 {
-	var outValues = new GeometryValues();
-	outValues.values = _geoValues.values;
-	outValues.points = _geoValues.points;
-	outValues.originalPoints = _geoValues.originalPoints;
-
-	var axis = new THREE.Vector3( 0, 0, 1 );
-
-	for ( var i = 0; i < _geoValues.points.length; ++i )
-	{
-		outValues.points[i].applyAxisAngle( axis, _angle );
-	}
-
-	return outValues;
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------------
-
-// function Rotate( _geoValues, _axis, _angle = 0 )
-// {
-// 	var angle = Math.PI * _angle / 180;
-// 	switch( _axis )
-// 	{
-// 		case 0: return Rotate_x( _geoValues, angle );
-// 		case 1: return Rotate_y( _geoValues, angle );
-// 		case 2: return Rotate_z( _geoValues, angle );
-// 		default: return;
-// 	}
-// }
-
-//----------------------------------------------------------------------------------------------------------------------------------------
-
-function Rotate( _geoValues, _axis, _angle = 45 )
-{
-	var angle = Math.PI * _angle / 180;
+	// var angle = Math.PI * _angle / 180;
 	
-	var outValues = new GeometryValues();
-	outValues.values = _geoValues.values;
-	outValues.points = _geoValues.points;
-	outValues.originalPoints = _geoValues.originalPoints;
-
-	var axis = new THREE.Vector3( 1, 0, 0 );
-
-	for ( var i = 0; i < outValues.points.length; ++i )
-	{
-		// outValues.points[i].x += _geoValues.offset.x;
-		// outValues.points[i].y += _geoValues.offset.y;
-		// outValues.points[i].z += _geoValues.offset.z;
-
-		// var tmp = outValues.points[i].x * Math.cos( angle ) - outValues.points[i].y * Math.sin( angle );
-		// outValues.points[i].y = outValues.points[i].y * Math.cos( angle ) + outValues.points[i].x * Math.sin( angle );
-		// outValues.points[i].x = tmp;
-		
+	for ( var i = 0; i < _geoValues.originalPoints.length; ++i )
+	{		
 		var x = _geoValues.offset.x;
 		var y = _geoValues.offset.y;
 		var z = _geoValues.offset.z;
 
-		x += outValues.points[i].x * Math.cos( angle ) - outValues.points[i].y * Math.sin( angle );
-		y += outValues.points[i].y * Math.cos( angle ) + outValues.points[i].x * Math.sin( angle );
-		z += outValues.points[i].z;
+		x += _geoValues.originalPoints[i].x * Math.cos( _angle ) - _geoValues.originalPoints[i].y * Math.sin( _angle );
+		y += _geoValues.originalPoints[i].x * Math.cos( _angle ) + _geoValues.originalPoints[i].y * Math.cos( _angle );
+		z += _geoValues.originalPoints[i].z;
 
-		outValues.values[i] = eval( _geoValues.expression );
+		_geoValues.values[i] = eval( _geoValues.expression );
 	}
+	
+	for ( var i = 0; i < _geoValues.originalPoints.length; ++i ) 
+	{
+		_geoValues.points[i].x = - _geoValues.originalPoints[i].x;
+		_geoValues.points[i].y = - _geoValues.originalPoints[i].y;
+		_geoValues.points[i].z = - _geoValues.originalPoints[i].z;
+	}	
+	return _geoValues;
+}
 
-	// for ( var i = 0; i < outValues.originalPoints.length; ++i ) 
-	// {
-	// 	outValues.points[i].x = - outValues.points[i].x;
-	// 	outValues.points[i].y = - outValues.points[i].y;
-	// 	outValues.points[i].z = - outValues.points[i].z;
-	// }	
-	// outValues.originalPoints = outValues.points;
-	return outValues;
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+function Rotate( _geoValues, _axis, _angle = 0 )
+{
+	var angle = Math.PI * _angle / 180;
+	switch( _axis )
+	{
+		case 0: return Rotate_x( _geoValues, angle );
+		case 1: return Rotate_y( _geoValues, angle );
+		case 2: return Rotate_z( _geoValues, angle );
+		default: return;
+	}
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------

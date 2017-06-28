@@ -33,7 +33,7 @@ class Polygonizer
             var x = this.m_axisMin + this.m_axisRange * i / (this.m_size - 1);
             var y = this.m_axisMin + this.m_axisRange * j / (this.m_size - 1);
             var z = this.m_axisMin + this.m_axisRange * k / (this.m_size - 1);
-                
+            
             geoValues.originalPoints.push( new THREE.Vector3( x , y , z ) );
 
             x += _offsetX;
