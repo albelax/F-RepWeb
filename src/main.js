@@ -429,28 +429,64 @@ function Intersection( /**/ )
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
+function Translate( _geoValues, _x = 0, _y = 0, _z = 0 )
+{
+	for ( var i = 0; i < _geoValues.originalPoints.length; ++i )
+	{		
+		var x = _geoValues.offset.x;
+		var y = _geoValues.offset.y;
+		var z = _geoValues.offset.z;
+
+		x += _geoValues.originalPoints[i].x + _x;
+		y += _geoValues.originalPoints[i].y + _y;
+		z += _geoValues.originalPoints[i].z + _z;
+
+		_geoValues.values[i] = eval( _geoValues.expression );
+	}
+	
+	for ( var i = 0; i < _geoValues.originalPoints.length; ++i ) 
+	{
+		_geoValues.points[i].x = - _geoValues.points[i].x;
+		_geoValues.points[i].y = - _geoValues.points[i].y;
+		_geoValues.points[i].z = - _geoValues.points[i].z;
+	}
+	return _geoValues;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+
 function Scale( _geoValues, _x = 1, _y = 1, _z = 1 )
 {
-	var outValues = new GeometryValues();
-	outValues.points = _geoValues.points;
-	outValues.values = _geoValues.values;
-	outValues.originalPoints = _geoValues.originalPoints;
+	for ( var i = 0; i < _geoValues.originalPoints.length; ++i )
+	{		
+		var x = _geoValues.offset.x;
+		var y = _geoValues.offset.y;
+		var z = _geoValues.offset.z;
 
-	for ( var i = 0; i < _geoValues.points.length; ++i )
-	{
-		outValues.points[i].x = (_geoValues.points[i].x * _x);
-		outValues.points[i].y = (_geoValues.points[i].y * _y);
-		outValues.points[i].z = (_geoValues.points[i].z * _z);
+		x += _geoValues.originalPoints[i].x / _x;
+		y += _geoValues.originalPoints[i].y / _y;
+		z += _geoValues.originalPoints[i].z / _z;
+
+		_geoValues.originalPoints[i].x = x;
+		_geoValues.originalPoints[i].y = y;
+		_geoValues.originalPoints[i].z = z;
+
+		_geoValues.values[i] = eval( _geoValues.expression );
 	}
-	return outValues;
+	
+	for ( var i = 0; i < _geoValues.originalPoints.length; ++i ) 
+	{
+		_geoValues.points[i].x = - _geoValues.points[i].x;
+		_geoValues.points[i].y = - _geoValues.points[i].y;
+		_geoValues.points[i].z = - _geoValues.points[i].z;
+	}	
+	return _geoValues;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
 function Rotate_x( _geoValues, _angle = 0 )
 {
-	// var angle = Math.PI * _angle / 180;
-	
 	for ( var i = 0; i < _geoValues.originalPoints.length; ++i )
 	{		
 		var x = _geoValues.offset.x;
@@ -461,15 +497,19 @@ function Rotate_x( _geoValues, _angle = 0 )
 		y += _geoValues.originalPoints[i].y * Math.sin( _angle ) + _geoValues.originalPoints[i].z * Math.cos( _angle );
 		z += _geoValues.originalPoints[i].y * Math.cos( _angle ) - _geoValues.originalPoints[i].z * Math.sin( _angle );
 
+		_geoValues.originalPoints[i].x = x;
+		_geoValues.originalPoints[i].y = y;
+		_geoValues.originalPoints[i].z = z;
+		
 		_geoValues.values[i] = eval( _geoValues.expression );
 	}
 	
 	for ( var i = 0; i < _geoValues.originalPoints.length; ++i ) 
 	{
-		_geoValues.points[i].x = - _geoValues.originalPoints[i].x;
-		_geoValues.points[i].y = - _geoValues.originalPoints[i].y;
-		_geoValues.points[i].z = - _geoValues.originalPoints[i].z;
-	}	
+		_geoValues.points[i].x = - _geoValues.points[i].x;
+		_geoValues.points[i].y = - _geoValues.points[i].y;
+		_geoValues.points[i].z = - _geoValues.points[i].z;
+	}
 	return _geoValues;
 }
 
@@ -477,8 +517,6 @@ function Rotate_x( _geoValues, _angle = 0 )
 
 function Rotate_y( _geoValues, _angle = 0 )
 {
-	// var angle = Math.PI * _angle / 180;
-	
 	for ( var i = 0; i < _geoValues.originalPoints.length; ++i )
 	{		
 		var x = _geoValues.offset.x;
@@ -504,9 +542,7 @@ function Rotate_y( _geoValues, _angle = 0 )
 //----------------------------------------------------------------------------------------------------------------------------------------
 
 function Rotate_z( _geoValues, _angle = 0 )
-{
-	// var angle = Math.PI * _angle / 180;
-	
+{	
 	for ( var i = 0; i < _geoValues.originalPoints.length; ++i )
 	{		
 		var x = _geoValues.offset.x;
@@ -542,5 +578,36 @@ function Rotate( _geoValues, _axis, _angle = 0 )
 		default: return;
 	}
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+function Twist(_geoValues, _angle)
+{
+	for ( var i = 0; i < _geoValues.originalPoints.length; ++i )
+	{		
+		var x = _geoValues.offset.x;
+		var y = _geoValues.offset.y;
+		var z = _geoValues.offset.z;
+
+		x += _geoValues.originalPoints[i].x;
+		y += _geoValues.originalPoints[i].y * Math.cos( _angle ) + _geoValues.originalPoints[i].z * Math.sin( _angle );
+		z += -_geoValues.originalPoints[i].y * Math.sin( _angle ) + _geoValues.originalPoints[i].z * Math.cos( _angle );
+
+		_geoValues.values[i] = eval( _geoValues.expression );
+	}
+	
+	for ( var i = 0; i < _geoValues.originalPoints.length; ++i ) 
+	{
+		_geoValues.points[i].x = - _geoValues.originalPoints[i].x;
+		_geoValues.points[i].y = - _geoValues.originalPoints[i].y;
+		_geoValues.points[i].z = - _geoValues.originalPoints[i].z;
+	}	
+	return _geoValues;
+}
+
+// t = (x-x1)/(x2-x1)
+// theta = (1-t)*theta1 + t*theta2
+// y’=y*cos(theta)+z*sin(theta)
+// z’=-y*sin(theta)+z*cos(theta)
 
 //----------------------------------------------------------------------------------------------------------------------------------------

@@ -41,8 +41,8 @@ class Polygonizer
             z += _offsetZ;
             
             geoValues.points.push( new THREE.Vector3( x + _offsetX , y + _offsetY, z + _offsetZ ) ); // modify here to translate!!!!
-        
-            geoValues.originalValues.push( new THREE.Vector3(x, y, z) ); // now I can rotate the values
+            
+            geoValues.originalValues.push( new THREE.Vector3( x, y, z ) ); // now I can rotate the values
             geoValues.values.push( eval( _expression ) );
         }
         return geoValues;
