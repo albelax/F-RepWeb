@@ -34,7 +34,7 @@ class Polygonizer
             var y = this.m_axisMin + this.m_axisRange * j / (this.m_size - 1);
             var z = this.m_axisMin + this.m_axisRange * k / (this.m_size - 1);
             
-            geoValues.originalPoints.push( new THREE.Vector3( x , y , z ) );
+            geoValues.editedPoints.push( new THREE.Vector3( x , y , z ) );
 
             x += _offsetX;
             y += _offsetY;
@@ -60,7 +60,7 @@ class Polygonizer
         
         // Marching Cubes Algorithm
         var size2 = this.m_size * this.m_size;
-
+        // _geometryValues.points = _geometryValues.editedPoints;
         // Vertices may occur along edges of cube, when the values at the edge's endpoints
         // straddle the isolevel value.
         // Actual position along edge weighted according to function values.
@@ -237,7 +237,7 @@ class GeometryValues
     {
         this.values = [];
         this.points = [];
-        this.originalPoints = [];
+        this.editedPoints = [];
         this.originalValues = [];
         this.expression;
         this.offset = new THREE.Vector3();

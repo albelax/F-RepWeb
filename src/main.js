@@ -122,7 +122,7 @@ function Evaluate()
 	var text = $('textarea#expression').val(); // get values from the expression text area
 	var color = $('textarea#color').val(); // get values from the color text area
 
-	console.log(color);
+	// console.log(color);
 	var output = eval( text );
 	var geometry;
 
@@ -298,7 +298,7 @@ function utilSubtract( _geoValues1, _geoValues2 = 0 )
 {
 	var outValues = new GeometryValues();
 	outValues.points = _geoValues1.points;
-	outValues.originalPoints = _geoValues1.originalPoints;
+	outValues.editedPoints = _geoValues1.editedPoints;
 
 	if ( _geoValues2 == 0 )
 		return _geoValues1;
@@ -308,12 +308,12 @@ function utilSubtract( _geoValues1, _geoValues2 = 0 )
 	}
 
 	// Inverse transformations
-	for ( var i = 0; i < _geoValues1.originalPoints.length; ++i ) 
-	{
-		outValues.points[i].x = - _geoValues1.originalPoints[i].x;
-		outValues.points[i].y = - _geoValues1.originalPoints[i].y;
-		outValues.points[i].z = - _geoValues1.originalPoints[i].z;
-	}
+	// for ( var i = 0; i < _geoValues1.editedPoints.length; ++i ) 
+	// {
+	// 	outValues.points[i].x = - _geoValues1.editedPoints[i].x;
+	// 	outValues.points[i].y = - _geoValues1.editedPoints[i].y;
+	// 	outValues.points[i].z = - _geoValues1.editedPoints[i].z;
+	// }
 
 	return outValues;
 }
@@ -327,7 +327,7 @@ function Subtract( /**/ )
 
 	for ( var i = 1; i < args.length; ++i )
 	{
-		console.log( args[i] );
+		// console.log( args[i] );
 		outValues = utilSubtract( outValues, args[i] );
 	}
 	
@@ -336,27 +336,59 @@ function Subtract( /**/ )
 
 //----------------------------------------------------------------------------------------------------------------------------------------
 
-function utilUnion( _geoValues1, _geoValues2 = 0 )
+function U( _geoValues1, _geoValues2 = 0 )
 {
+	console.log(_geoValues1.points, _geoValues2.points);
+	console.log(_geoValues1.editedPoints, _geoValues2.editedPoints);
+	
 	var outValues = new GeometryValues();
 	outValues.points = _geoValues1.points;
-	outValues.originalPoints = _geoValues1.originalPoints;
+	outValues.editedPoints = _geoValues1.editedPoints;
 
 	if ( _geoValues2 == 0 )
 		return _geoValues1;
 	for ( var i = 0; i < _geoValues1.values.length; ++i )
 	{
-		outValues.values[i] = Math.max( _geoValues1.values[i], _geoValues2.values[i] );
+		outValues.editedPoints[i].x = Math.max( _geoValues1.editedPoints[i].x, _geoValues2.editedPoints[i].x );
+		outValues.editedPoints[i].y = Math.max( _geoValues1.editedPoints[i].y, _geoValues2.editedPoints[i].y );
+		outValues.editedPoints[i].z = Math.max( _geoValues1.editedPoints[i].z, _geoValues2.editedPoints[i].z );
+
+
+		var x = outValues.editedPoints[i].x;
+		var y = outValues.editedPoints[i].y;
+		var z = outValues.editedPoints[i].z;
+		
+		outValues.values[i] = eval("Math.max("+_geoValues1.expression+","+_geoValues2.expression+")");
+	}
+
+	return outValues;
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+function utilUnion( _geoValues1, _geoValues2 = 0 )
+{
+	var outValues = new GeometryValues();
+	// outValues.points = _geoValues1.points;
+	// outValues.editedPoints = _geoValues1.editedPoints;
+
+	if ( _geoValues2 == 0 )
+		return _geoValues1;
+	for ( var i = 0; i < _geoValues1.values.length; ++i )
+	{
+		_geoValues1.values[i] = Math.max( _geoValues1.values[i], _geoValues2.values[i] );
+
+		// outValues.points[i].x = - _geoValues1.editedPoints[i].x;
+		// outValues.points[i].y = - _geoValues1.editedPoints[i].y;
+		// outValues.points[i].z = - _geoValues1.editedPoints[i].z;
 	}
 
 	// Inverse transformations
-	for ( var i = 0; i < _geoValues1.originalPoints.length; ++i ) 
-	{
-		outValues.points[i].x = - _geoValues1.originalPoints[i].x;
-		outValues.points[i].y = - _geoValues1.originalPoints[i].y;
-		outValues.points[i].z = - _geoValues1.originalPoints[i].z;
-	}	
-	return outValues;
+	// for ( var i = 0; i < _geoValues1.editedPoints.length; ++i ) 
+	// {
+
+	// }	
+	return _geoValues1;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
@@ -369,7 +401,7 @@ function Union( /**/ )
 	for ( var i = 0; i < args.length; ++i )
 	{
 		expressions.push(args[i].expression);
-		console.log(args[i]);
+		// console.log(args[i]);
 		outValues = utilUnion( args[i], outValues );
 	}
 	outValues.expression = "Math.max(";
@@ -392,7 +424,7 @@ function utilIntersection( _geoValues1, _geoValues2 = 0 )
 {
 	var outValues = new GeometryValues();
 	outValues.points = _geoValues1.points;
-	outValues.originalPoints = _geoValues1.originalPoints;
+	outValues.editedPoints = _geoValues1.editedPoints;
 
 	if ( _geoValues2 == 0 )
 		return _geoValues1;
@@ -401,13 +433,13 @@ function utilIntersection( _geoValues1, _geoValues2 = 0 )
 		outValues.values[i] = Math.min( _geoValues1.values[i], _geoValues2.values[i] );
 	}
 
-	// Inverse transformations
-	for ( var i = 0; i < _geoValues1.originalPoints.length; ++i ) 
-	{
-		outValues.points[i].x = - _geoValues1.originalPoints[i].x;
-		outValues.points[i].y = - _geoValues1.originalPoints[i].y;
-		outValues.points[i].z = - _geoValues1.originalPoints[i].z;
-	}	
+	// // Inverse transformations
+	// for ( var i = 0; i < _geoValues1.editedPoints.length; ++i ) 
+	// {
+	// 	outValues.points[i].x = - _geoValues1.editedPoints[i].x;
+	// 	outValues.points[i].y = - _geoValues1.editedPoints[i].y;
+	// 	outValues.points[i].z = - _geoValues1.editedPoints[i].z;
+	// }	
 	return outValues;
 }
 
@@ -420,7 +452,7 @@ function Intersection( /**/ )
 
 	for ( var i = 0; i < args.length; ++i )
 	{
-		console.log( args[i] );
+		// console.log( args[i] );
 		outValues = utilIntersection( args[i], outValues );
 	}
 	
@@ -431,25 +463,27 @@ function Intersection( /**/ )
 
 function Translate( _geoValues, _x = 0, _y = 0, _z = 0 )
 {
-	for ( var i = 0; i < _geoValues.originalPoints.length; ++i )
+	for ( var i = 0; i < _geoValues.editedPoints.length; ++i )
 	{		
-		var x = _geoValues.offset.x;
-		var y = _geoValues.offset.y;
-		var z = _geoValues.offset.z;
+		var x = _geoValues.editedPoints[i].x - _x;
+		var y = _geoValues.editedPoints[i].y - _y;
+		var z = _geoValues.editedPoints[i].z - _z;
 
-		x += _geoValues.originalPoints[i].x + _x;
-		y += _geoValues.originalPoints[i].y + _y;
-		z += _geoValues.originalPoints[i].z + _z;
+		_geoValues.editedPoints[i].x = -x;
+		_geoValues.editedPoints[i].y = -y;
+		_geoValues.editedPoints[i].z = -z;
+
+		// _geoValues.offset.x += _x;
+		// _geoValues.offset.x += _y;
+		// _geoValues.offset.x += _z;
 
 		_geoValues.values[i] = eval( _geoValues.expression );
+
+		// _geoValues.points[i].x = - _geoValues.points[i].x;
+		// _geoValues.points[i].y = - _geoValues.points[i].y;
+		// _geoValues.points[i].z = - _geoValues.points[i].z;
 	}
 	
-	for ( var i = 0; i < _geoValues.originalPoints.length; ++i ) 
-	{
-		_geoValues.points[i].x = - _geoValues.points[i].x;
-		_geoValues.points[i].y = - _geoValues.points[i].y;
-		_geoValues.points[i].z = - _geoValues.points[i].z;
-	}
 	return _geoValues;
 }
 
@@ -457,29 +491,23 @@ function Translate( _geoValues, _x = 0, _y = 0, _z = 0 )
 
 function Scale( _geoValues, _x = 1, _y = 1, _z = 1 )
 {
-	for ( var i = 0; i < _geoValues.originalPoints.length; ++i )
+	for ( var i = 0; i < _geoValues.editedPoints.length; ++i )
 	{		
-		var x = _geoValues.offset.x;
-		var y = _geoValues.offset.y;
-		var z = _geoValues.offset.z;
+		// var x = _geoValues.offset.x;
+		// var y = _geoValues.offset.y;
+		// var z = _geoValues.offset.z;
 
-		x += _geoValues.originalPoints[i].x / _x;
-		y += _geoValues.originalPoints[i].y / _y;
-		z += _geoValues.originalPoints[i].z / _z;
+		var x = _geoValues.editedPoints[i].x / _x;
+		var y = _geoValues.editedPoints[i].y / _y;
+		var z = _geoValues.editedPoints[i].z / _z;
 
-		_geoValues.originalPoints[i].x = x;
-		_geoValues.originalPoints[i].y = y;
-		_geoValues.originalPoints[i].z = z;
+		_geoValues.editedPoints[i].x = x;
+		_geoValues.editedPoints[i].y = y;
+		_geoValues.editedPoints[i].z = z;
 
 		_geoValues.values[i] = eval( _geoValues.expression );
 	}
 	
-	for ( var i = 0; i < _geoValues.originalPoints.length; ++i ) 
-	{
-		_geoValues.points[i].x = - _geoValues.points[i].x;
-		_geoValues.points[i].y = - _geoValues.points[i].y;
-		_geoValues.points[i].z = - _geoValues.points[i].z;
-	}	
 	return _geoValues;
 }
 
@@ -487,29 +515,30 @@ function Scale( _geoValues, _x = 1, _y = 1, _z = 1 )
 
 function Rotate_x( _geoValues, _angle = 0 )
 {
-	for ( var i = 0; i < _geoValues.originalPoints.length; ++i )
+	if (_angle == 0)
+		return _geoValues;
+	for ( var i = 0; i < _geoValues.editedPoints.length; ++i )
 	{		
 		var x = _geoValues.offset.x;
 		var y = _geoValues.offset.y;
 		var z = _geoValues.offset.z;
 
-		x += _geoValues.originalPoints[i].x;
-		y += _geoValues.originalPoints[i].y * Math.sin( _angle ) + _geoValues.originalPoints[i].z * Math.cos( _angle );
-		z += _geoValues.originalPoints[i].y * Math.cos( _angle ) - _geoValues.originalPoints[i].z * Math.sin( _angle );
+		x = _geoValues.editedPoints[i].x;
+		y = _geoValues.editedPoints[i].y * Math.sin( _angle ) + _geoValues.editedPoints[i].z * Math.cos( _angle );
+		z = _geoValues.editedPoints[i].y * Math.cos( _angle ) - _geoValues.editedPoints[i].z * Math.sin( _angle );
 
-		_geoValues.originalPoints[i].x = x;
-		_geoValues.originalPoints[i].y = y;
-		_geoValues.originalPoints[i].z = z;
+		_geoValues.editedPoints[i].x = x;
+		_geoValues.editedPoints[i].y = y;
+		_geoValues.editedPoints[i].z = z;
 		
+		// _geoValues.points[i].x = x;
+		// _geoValues.points[i].y = y;
+		// _geoValues.points[i].z = z;
+
 		_geoValues.values[i] = eval( _geoValues.expression );
+
 	}
 	
-	for ( var i = 0; i < _geoValues.originalPoints.length; ++i ) 
-	{
-		_geoValues.points[i].x = - _geoValues.points[i].x;
-		_geoValues.points[i].y = - _geoValues.points[i].y;
-		_geoValues.points[i].z = - _geoValues.points[i].z;
-	}
 	return _geoValues;
 }
 
@@ -517,25 +546,22 @@ function Rotate_x( _geoValues, _angle = 0 )
 
 function Rotate_y( _geoValues, _angle = 0 )
 {
-	for ( var i = 0; i < _geoValues.originalPoints.length; ++i )
+	for ( var i = 0; i < _geoValues.editedPoints.length; ++i )
 	{		
 		var x = _geoValues.offset.x;
 		var y = _geoValues.offset.y;
 		var z = _geoValues.offset.z;
 
-		x += _geoValues.originalPoints[i].z * Math.cos( _angle ) - _geoValues.originalPoints[i].x * Math.sin( _angle );
-		y += _geoValues.originalPoints[i].y;
-		z += _geoValues.originalPoints[i].z * Math.sin( _angle ) + _geoValues.originalPoints[i].x * Math.cos( _angle );
+		x = _geoValues.editedPoints[i].z * Math.cos( _angle ) - _geoValues.editedPoints[i].x * Math.sin( _angle );
+		y = _geoValues.editedPoints[i].y;
+		z = _geoValues.editedPoints[i].z * Math.sin( _angle ) + _geoValues.editedPoints[i].x * Math.cos( _angle );
+
+		_geoValues.editedPoints[i].x = x;
+		_geoValues.editedPoints[i].y = y;
+		_geoValues.editedPoints[i].z = z;
 
 		_geoValues.values[i] = eval( _geoValues.expression );
 	}
-	
-	for ( var i = 0; i < _geoValues.originalPoints.length; ++i ) 
-	{
-		_geoValues.points[i].x = - _geoValues.originalPoints[i].x;
-		_geoValues.points[i].y = - _geoValues.originalPoints[i].y;
-		_geoValues.points[i].z = - _geoValues.originalPoints[i].z;
-	}	
 	return _geoValues;
 }
 
@@ -543,24 +569,21 @@ function Rotate_y( _geoValues, _angle = 0 )
 
 function Rotate_z( _geoValues, _angle = 0 )
 {	
-	for ( var i = 0; i < _geoValues.originalPoints.length; ++i )
+	for ( var i = 0; i < _geoValues.editedPoints.length; ++i )
 	{		
 		var x = _geoValues.offset.x;
 		var y = _geoValues.offset.y;
 		var z = _geoValues.offset.z;
 
-		x += _geoValues.originalPoints[i].x * Math.cos( _angle ) - _geoValues.originalPoints[i].y * Math.sin( _angle );
-		y += _geoValues.originalPoints[i].x * Math.cos( _angle ) + _geoValues.originalPoints[i].y * Math.cos( _angle );
-		z += _geoValues.originalPoints[i].z;
+		x = _geoValues.editedPoints[i].x * Math.cos( _angle ) - _geoValues.editedPoints[i].y * Math.sin( _angle );
+		y = _geoValues.editedPoints[i].x * Math.cos( _angle ) + _geoValues.editedPoints[i].y * Math.cos( _angle );
+		z = _geoValues.editedPoints[i].z;
+
+		_geoValues.editedPoints[i].x = x;
+		_geoValues.editedPoints[i].y = y;
+		_geoValues.editedPoints[i].z = z;
 
 		_geoValues.values[i] = eval( _geoValues.expression );
-	}
-	
-	for ( var i = 0; i < _geoValues.originalPoints.length; ++i ) 
-	{
-		_geoValues.points[i].x = - _geoValues.originalPoints[i].x;
-		_geoValues.points[i].y = - _geoValues.originalPoints[i].y;
-		_geoValues.points[i].z = - _geoValues.originalPoints[i].z;
 	}	
 	return _geoValues;
 }
@@ -578,36 +601,5 @@ function Rotate( _geoValues, _axis, _angle = 0 )
 		default: return;
 	}
 }
-
-//----------------------------------------------------------------------------------------------------------------------------------------
-
-function Twist(_geoValues, _angle)
-{
-	for ( var i = 0; i < _geoValues.originalPoints.length; ++i )
-	{		
-		var x = _geoValues.offset.x;
-		var y = _geoValues.offset.y;
-		var z = _geoValues.offset.z;
-
-		x += _geoValues.originalPoints[i].x;
-		y += _geoValues.originalPoints[i].y * Math.cos( _angle ) + _geoValues.originalPoints[i].z * Math.sin( _angle );
-		z += -_geoValues.originalPoints[i].y * Math.sin( _angle ) + _geoValues.originalPoints[i].z * Math.cos( _angle );
-
-		_geoValues.values[i] = eval( _geoValues.expression );
-	}
-	
-	for ( var i = 0; i < _geoValues.originalPoints.length; ++i ) 
-	{
-		_geoValues.points[i].x = - _geoValues.originalPoints[i].x;
-		_geoValues.points[i].y = - _geoValues.originalPoints[i].y;
-		_geoValues.points[i].z = - _geoValues.originalPoints[i].z;
-	}	
-	return _geoValues;
-}
-
-// t = (x-x1)/(x2-x1)
-// theta = (1-t)*theta1 + t*theta2
-// y’=y*cos(theta)+z*sin(theta)
-// z’=-y*sin(theta)+z*cos(theta)
 
 //----------------------------------------------------------------------------------------------------------------------------------------

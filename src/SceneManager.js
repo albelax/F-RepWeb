@@ -64,8 +64,14 @@ class SceneManager
     	this.m_lights[1].position.set(10,0,0);
     	this.scene.add(this.m_lights[1]);
     	this.m_lights[2] = new THREE.PointLight(0xffffff);
-    	this.m_lights[2].position.set(0,0,10);
+    	this.m_lights[2].position.set(-10,0,0);
     	this.scene.add(this.m_lights[2]);
+        this.m_lights.push( new THREE.PointLight(0xffffff) );
+        this.m_lights[3].position.set(0,0,10);
+    	this.scene.add(this.m_lights[3]);
+        this.m_lights.push( new THREE.PointLight(0xffffff) );
+        this.m_lights[4].position.set(0,0,-10);
+    	this.scene.add(this.m_lights[4]);
     	this.createGrid( 20, 10 );
     	this.camera.layers.enable( 1 );
 
