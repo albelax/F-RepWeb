@@ -139,13 +139,13 @@ class SceneManager
         
         if ( _expression != 0 && _expression.constructor.name == "String" )
         {
-            expression = _expression.split(",");
+            expression = _expression.split(";");
         }
         else
             expression = ['x', 'y', 'z'];
 
         var faceIndices = [ 'a', 'b', 'c' ];
-        var radius = 2.5;
+
         for ( var i = 0; i < _geometry.faces.length; i ++ ) 
 		{
 			f = _geometry.faces[ i ];
@@ -160,11 +160,7 @@ class SceneManager
                 var z = p.z;
 				
                 color = new THREE.Color( 0xffffff );
-				// color.setHSL( ( p.y + 1 ) / 2, 1.0, 0.5 );
                 color.setRGB( eval( expression[0] ), eval( expression[1] ), eval( expression[2] ) );
-                // color.setRGB( Math.sin(x) * 0.5 + 0.5, 1.0, 0.0);
-                // color.setHSL( p.y * p.x*2, 1.0, 0.5 );
-                // color.setHSL( 0.125 * vertexIndex/_geometry.vertices.length, 1.0, 0.5 );
 				f.vertexColors[ j ] = color;
 			}
 		}

@@ -11,6 +11,24 @@ class Polygonizer
         this.type = "MARCHING_CUBES";
     }
 
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+    getPoints()
+    {
+        // returns the pointset of the space that needs to be evaluated
+        var points = [];
+        for (var k = 0; k < this.m_size; k++)
+        for (var j = 0; j < this.m_size; j++)
+        for (var i = 0; i < this.m_size; i++)
+        {
+            var x = this.m_axisMin + this.m_axisRange * i / (this.m_size - 1);
+            var y = this.m_axisMin + this.m_axisRange * j / (this.m_size - 1);
+            var z = this.m_axisMin + this.m_axisRange * k / (this.m_size - 1); 
+            points.push( new THREE.Vector3( x, y, z ) );
+        }
+        return points;
+    }
+    
     //----------------------------------------------------------------------------------------------------------------------------------------
 
     getValues( _expression, _offsetX = 0, _offsetY = 0, _offsetZ = 0 )
@@ -23,8 +41,10 @@ class Polygonizer
         geoValues.offset.z = _offsetZ;
 
         geoValues.expression = _expression;
+
         // console.log(geoValues.expression);
         // Generate a list of 3D points and values at those points
+
         for (var k = 0; k < this.m_size; k++)
         for (var j = 0; j < this.m_size; j++)
         for (var i = 0; i < this.m_size; i++)
