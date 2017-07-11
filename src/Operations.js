@@ -157,7 +157,7 @@ function Twist_z( _x, _y, _z, _z1, _z2, _theta1 = 0, _theta2 = 0 )
 
 function BlendingUnion( _f1, _f2, _a, _a1, _a2 )
 {
-	var disp = _a /( 1 + ( _f1 / _a1 )**2 + ( _f2 / _a2 )**2 );
+	var disp = _a /( 1 + ( _f1 / _a1 )*( _f1 / _a1 ) + ( _f2 / _a2 )*( _f2 / _a2 ) );
 	return disp + Union( _f1, _f2 );
 }
 
@@ -165,7 +165,7 @@ function BlendingUnion( _f1, _f2, _a, _a1, _a2 )
 
 function BlendingIntersection( _f1, _f2, _a, _a1, _a2 )
 {
-	var disp = _a /( 1 + ( _f1 / _a1 )**2 + ( _f2 / _a2 )**2 );
+	var disp = _a /( 1 + ( _f1 / _a1 )*( _f1 / _a1 ) + ( _f2 / _a2 )*( _f2 / _a2 ) );
 	return disp + Intersection( _f1, _f2 );
 }
 
