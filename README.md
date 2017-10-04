@@ -3,16 +3,16 @@
 This Project was developed when I Student Research Assistant, it consists of an web based F-Rep modeling system based on HyperFun (http://hyperfun.org/).
 In F-Rep the axis operations must me performed first, after thet they can be applied to the primitives, and finally we can use boolean, and other operations.
 
-# Instructions:
+## Instructions:
 
 - open the html file to run
 - press w to toggle wireframe modes
 - to declare a variable: var a = 5
 
 
-# Axis Operations
+## Axis Operations
 
-- Translate
+### Translate
 ```
 Translate( _x, _y, _z, t_x = 0, t_y = 0, t_z = 0 );
 ```
