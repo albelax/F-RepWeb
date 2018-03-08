@@ -7,8 +7,7 @@ In F-Rep the axis operations must me performed first, after thet they can be app
 
 - open the html file to run
 - press w to toggle wireframe modes
-- to declare a variable: var a = 5
-
+- variables are declared as usual in JavaScript
 
 ## Axis Operations
 
