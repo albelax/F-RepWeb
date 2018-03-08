@@ -1,4 +1,4 @@
-# SRA
+# Student Research Assistant Project
 
 This Project was developed when I Student Research Assistant, it consists of an web based F-Rep modeling system based on HyperFun (http://hyperfun.org/).
 In F-Rep the axis operations must me performed first, after thet they can be applied to the primitives, and finally we can use boolean, and other operations.
