@@ -19,7 +19,7 @@ Translate( _x, _y, _z, t_x = 0, t_y = 0, t_z = 0 );
 In order to translate an object we need to input first the coordinates we want to translate from and then the amount we want to translate in each axis.
 
 ```
-var translatedCoordinates = Translate(x, y, z, 1, 0, 0 );
+var translatedCoordinates = Translate( x, y, z, 1, 0, 0 );
 ```
 ### Scale
 ```
@@ -28,7 +28,7 @@ Scale( _x, _y, _z, t_x = 0, t_y = 0, t_z = 0 );
 In order to Scale an object we need to input first the coordinates we want to Scale from and then the amount we want to Scale in each axis.
 
 ```
-var scaledCoordinates = Scale(x, y, z, 1, 0, 0 );
+var scaledCoordinates = Scale( x, y, z, 1, 0, 0 );
 ```
 ### Rotation
 ```
